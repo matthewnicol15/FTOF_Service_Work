@@ -35,7 +35,7 @@ void SetLorentzVector(TLorentzVector &p4,clas12::region_part_ptr rp){
 
 }
 
-void FTOF_2pi_Missing_Pim_FTOF2(){
+void FTOF_2pi_Missing_Pim(){
 
   // Data files to process
   TString inputFile1("/lustre19/expphy/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_0050*.hipo");
