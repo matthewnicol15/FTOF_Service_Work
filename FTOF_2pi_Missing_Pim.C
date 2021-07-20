@@ -35,7 +35,7 @@ void SetLorentzVector(TLorentzVector &p4,clas12::region_part_ptr rp){
 
 }
 
-void FTOF_2pi_Missing_Pim_FTOF2(){
+void FTOF_2pi_Missing_Pim(){
 
   // Data files to process
   TString inputFile1("/home/matthewn/links/RGB_Spring_2019_Inbending_dst/*.hipo");
