@@ -38,7 +38,11 @@ void SetLorentzVector(TLorentzVector &p4,clas12::region_part_ptr rp){
 void FTOF_2pi_Missing_Pim(){
 
   // Data files to process
+<<<<<<< HEAD
   TString inputFile1("/home/matthewn/links/RGB_Spring_2019_Inbending_dst/*.hipo");
+=======
+  TString inputFile1("/lustre19/expphy/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_0050*.hipo");
+>>>>>>> 746002c24cbd1e4ca1e3da8f0b430e15d2e783da
   // TString inputFile1("/lustre19/expphy/volatile/clas12/rg-a/production/recon/fall2018/torus+1/pass1/v1/dst/train/skim4/*.hipo");
   // TString inputFile1("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_005117.hipo");
   // TString inputFile2("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_005124.hipo");
@@ -61,8 +65,12 @@ void FTOF_2pi_Missing_Pim(){
   // Access information from PDG e.g. particle masses
   auto db=TDatabasePDG::Instance();
   TLorentzVector beam(0,0,10.6,10.6); // beam Px,Py,Pz,E
+<<<<<<< HEAD
   TLorentzVector target(0,0,0,1.8756); // target Px,Py,Pz,E
   // TLorentzVector target(0,0,0,db->GetParticle(2212)->Mass()); // target Px,Py,Pz,E
+=======
+  TLorentzVector target(0,0,0,db->GetParticle(2212)->Mass()); // target Px,Py,Pz,E
+>>>>>>> 746002c24cbd1e4ca1e3da8f0b430e15d2e783da
   TLorentzVector el(0,0,0,db->GetParticle(11)->Mass()); // scattered e^- Px,Py,Pz,E
   TLorentzVector pr(0,0,0,db->GetParticle(2212)->Mass()); // proton Px,Py,Pz,E
   TLorentzVector pip(0,0,0,db->GetParticle(211)->Mass()); // pi^+ Px,Py,Pz,E
@@ -79,11 +87,18 @@ void FTOF_2pi_Missing_Pim(){
   // Gets total events in all files for run dependence binning
   Int_t Bins = files->GetEntries();
   // Output file location and name
+<<<<<<< HEAD
   TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGB_SPING2019_dst_Inbending_2pi_misspim_binning_20072021_01.root","recreate");
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Create histograms here
 
+=======
+  TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGA_FALL2018_skim4_Inbending_50_2pi_misspim_FTOF2_13072021_01.root","recreate");
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Create histograms here
+>>>>>>> 746002c24cbd1e4ca1e3da8f0b430e15d2e783da
   // 2 pi event histograms
   auto* hmass=new TH1F("pimmass","Missing Mass e' p #pi^{+};MM(e'p#pi^{+}) [GeV];Counts",200,-1,1);
   auto* hmass_cuts=new TH1F("hmass_cuts","Missing Mass e' p #pi^{+};MM(e'p#pi^{+}) [GeV];Counts",200,-1,1);
