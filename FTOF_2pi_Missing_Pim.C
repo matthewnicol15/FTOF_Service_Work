@@ -38,7 +38,11 @@ void SetLorentzVector(TLorentzVector &p4,clas12::region_part_ptr rp){
 void FTOF_2pi_Missing_Pim(){
 
   // Data files to process
+<<<<<<< HEAD
+  TString inputFile1("/home/matthewn/links/RGB_Spring_2019_Inbending_dst/*.hipo");
+=======
   TString inputFile1("/lustre19/expphy/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_0050*.hipo");
+>>>>>>> 746002c24cbd1e4ca1e3da8f0b430e15d2e783da
   // TString inputFile1("/lustre19/expphy/volatile/clas12/rg-a/production/recon/fall2018/torus+1/pass1/v1/dst/train/skim4/*.hipo");
   // TString inputFile1("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_005117.hipo");
   // TString inputFile2("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_005124.hipo");
@@ -61,7 +65,12 @@ void FTOF_2pi_Missing_Pim(){
   // Access information from PDG e.g. particle masses
   auto db=TDatabasePDG::Instance();
   TLorentzVector beam(0,0,10.6,10.6); // beam Px,Py,Pz,E
+<<<<<<< HEAD
+  TLorentzVector target(0,0,0,1.8756); // target Px,Py,Pz,E
+  // TLorentzVector target(0,0,0,db->GetParticle(2212)->Mass()); // target Px,Py,Pz,E
+=======
   TLorentzVector target(0,0,0,db->GetParticle(2212)->Mass()); // target Px,Py,Pz,E
+>>>>>>> 746002c24cbd1e4ca1e3da8f0b430e15d2e783da
   TLorentzVector el(0,0,0,db->GetParticle(11)->Mass()); // scattered e^- Px,Py,Pz,E
   TLorentzVector pr(0,0,0,db->GetParticle(2212)->Mass()); // proton Px,Py,Pz,E
   TLorentzVector pip(0,0,0,db->GetParticle(211)->Mass()); // pi^+ Px,Py,Pz,E
@@ -78,10 +87,18 @@ void FTOF_2pi_Missing_Pim(){
   // Gets total events in all files for run dependence binning
   Int_t Bins = files->GetEntries();
   // Output file location and name
+<<<<<<< HEAD
+  TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGB_SPING2019_dst_Inbending_2pi_misspim_binning_20072021_01.root","recreate");
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Create histograms here
+
+=======
   TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGA_FALL2018_skim4_Inbending_50_2pi_misspim_FTOF2_13072021_01.root","recreate");
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Create histograms here
+>>>>>>> 746002c24cbd1e4ca1e3da8f0b430e15d2e783da
   // 2 pi event histograms
   auto* hmass=new TH1F("pimmass","Missing Mass e' p #pi^{+};MM(e'p#pi^{+}) [GeV];Counts",200,-1,1);
   auto* hmass_cuts=new TH1F("hmass_cuts","Missing Mass e' p #pi^{+};MM(e'p#pi^{+}) [GeV];Counts",200,-1,1);
@@ -142,13 +159,29 @@ void FTOF_2pi_Missing_Pim(){
         Tracks_name_stream<<"h_Tracks_Det_"<<i_detector<<"_Charge_"<<i_charge<<"_Sec_"<<i_sector;
 
         // Defining the histogram title strings
-        if (i_detector==0) Traj_title_stream<<"Trajectories FTOF1A Charge "<<2*i_charge-1<<" Sec "<<i_sector+1<<"; Run no.; L [cm]";
-        else if (i_detector==1) Traj_title_stream<<"Trajectories FTOF2 Charge "<<2*i_charge-1<<" Sec "<<i_sector+1<<"; Run no.; L [cm]";
-        else if (i_detector==2) Traj_title_stream<<"Trajectories FTOF2 Charge "<<2*i_charge-1<<" Sec "<<i_sector+1<<"; Run no.; L [cm]";
+        if (i_detector==0){
+          Traj_title_stream<<"Trajectories FTOF1A Charge "<<2*i_charge-1<<" Sec "<<i_sector+1<<"; Run no.; L [cm]";
 
-        //convert the stringstream to a string and define our histograms in each element of the array
-        h_Trajectories[i_detector][i_charge][i_sector] = new TH3F(Traj_name_stream.str().c_str(),"", Bins,0,Bins,90,0,900, 50, -250, 250);
-        h_Tracks[i_detector][i_charge][i_sector] = new TH3F(Tracks_name_stream.str().c_str(),"", Bins,0,Bins,90,0,900, 50, -250 , 250);
+          //convert the stringstream to a string and define our histograms in each element of the array
+          h_Trajectories[i_detector][i_charge][i_sector] = new TH3F(Traj_name_stream.str().c_str(),"", Bins,0,Bins, 25, 54.51, 434.01, 50, -250, 250);
+          h_Tracks[i_detector][i_charge][i_sector] = new TH3F(Tracks_name_stream.str().c_str(),"", Bins,0,Bins, 25, 54.51, 434.01, 50, -250 , 250);
+
+        }
+        else if (i_detector==1){
+          Traj_title_stream<<"Trajectories FTOF2 Charge "<<2*i_charge-1<<" Sec "<<i_sector+1<<"; Run no.; L [cm]";
+
+          //convert the stringstream to a string and define our histograms in each element of the array
+          h_Trajectories[i_detector][i_charge][i_sector] = new TH3F(Traj_name_stream.str().c_str(),"", Bins,0,Bins, 65, 42.7, 440.5, 50, -250, 250);
+          h_Tracks[i_detector][i_charge][i_sector] = new TH3F(Tracks_name_stream.str().c_str(),"", Bins,0,Bins, 65, 42.7, 440.5, 50, -250 , 250);
+        }
+        else if (i_detector==2){
+          Traj_title_stream<<"Trajectories FTOF2 Charge "<<2*i_charge-1<<" Sec "<<i_sector+1<<"; Run no.; L [cm]";
+
+          //convert the stringstream to a string and define our histograms in each element of the array
+          h_Trajectories[i_detector][i_charge][i_sector] = new TH3F(Traj_name_stream.str().c_str(),"", Bins,0,Bins, 7, 693, 847, 50, -250, 250);
+          h_Tracks[i_detector][i_charge][i_sector] = new TH3F(Tracks_name_stream.str().c_str(),"", Bins,0,Bins, 7, 693, 847, 50, -250 , 250);
+        }
+
 
         // Setting the title for each histogram as it did not work when put in the lines above
         h_Trajectories[i_detector][i_charge][i_sector]->SetTitle(Traj_title_stream.str().c_str());
@@ -252,10 +285,11 @@ void FTOF_2pi_Missing_Pim(){
       }
 
       // Getting 2pi events
-      if(nonelectron == 1 && electrons.size() == 1 && protons.size() == 1 && pips.size() == 1 && positive == 2){
+      if(nonelectron != 1 || electrons.size() != 1 || protons.size() != 1 || pips.size() != 1 || positive == 2)continue;
+      {
         // cout<<pim.Rho()<<endl;
         // Apply cut on pion momentum to look at momentum dependence
-        if(pim.Rho()<2.5 /*|| pim.Rho()>2.5*/)continue;
+        // if(pim.Rho()<2.5 /*|| pim.Rho()>2.5*/)continue;
         // cout<<"test "<<pim.Rho()<<endl;
 
 
@@ -274,11 +308,9 @@ void FTOF_2pi_Missing_Pim(){
         DeltaTheta = TMath::RadToDeg()* (misspim.Theta() - pim.Theta());
         DeltaPhi = TMath::RadToDeg()* (misspim.Phi() - pim.Phi());
 
-        // cout<<fabs(DeltaP)<<" "<<fabs(DeltaTheta)<<" "<<fabs(DeltaPhi)<<" "<<endl;
 
         // Checking the background after cuts
         if(fabs(DeltaP) < 0.3 && fabs(DeltaTheta) < 10 && fabs(DeltaPhi) < 10 ){
-          // cout<<fabs(DeltaP)<<" "<<fabs(DeltaTheta)<<" "<<fabs(DeltaPhi)<<" "<<endl;
 
           hmass_cuts->Fill(misspim.M2());
         }
