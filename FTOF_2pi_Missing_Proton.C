@@ -298,7 +298,7 @@ void FTOF_2pi_Missing_Proton(){
                 pindex++;
 
                 //Ignore the first particle (trigger), any neutrals and electron
-                if (pindex==1 || p->par()->getCharge()==0 || p->par()->getPid()==11) continue;
+                if (pindex==1 || p->par()->getCharge()==0 || p->par()->getCharge() < 0 || p->par()->getPid()==11 || p->par()->getPid()==211) continue;
 
                 runno = c12.runconfig()->getRun(); // Getting the run number
                 Status = p->par()->getStatus(); // Getting the status

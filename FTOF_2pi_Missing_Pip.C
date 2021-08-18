@@ -38,8 +38,8 @@ void SetLorentzVector(TLorentzVector &p4,clas12::region_part_ptr rp){
 void FTOF_2pi_Missing_Pip(){
 
   // Data files to process
-  // TString inputFile1("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/*.hipo");
-  TString inputFile1("/volatile/clas12/rg-a/production/recon/spring2019/torus-1/pass1/v2/dst/train/skim4/*.hipo");
+  TString inputFile1("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/*.hipo");
+  // TString inputFile1("/volatile/clas12/rg-a/production/recon/spring2019/torus-1/pass1/v2/dst/train/skim4/*.hipo");
   // TString inputFile2("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_005124.hipo");
   // TString inputFile3("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_005125.hipo");
   // TString inputFile4("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_005126.hipo");
@@ -77,7 +77,7 @@ void FTOF_2pi_Missing_Pip(){
   // Gets total events in all files for run dependence binning
   Int_t Bins = files->GetEntries();
   // Output file location and name
-  TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGA_SPRING2019_skim4_Inbending_2pi_misspip_20072021_01.root","recreate");
+  TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGA_FALL2018_skim4_Inbending_2pi_misspip_21072021_01.root","recreate");
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Create histograms here
@@ -296,7 +296,7 @@ void FTOF_2pi_Missing_Pip(){
                 pindex++;
 
                 //Ignore the first particle (trigger), any neutrals and electron
-                if (pindex==1 || p->par()->getCharge()==0 || p->par()->getPid()==11) continue;
+                if (pindex==1 || p->par()->getCharge()==0 || p->par()->getCharge() < 0 || p->par()->getPid()==11 || p->par()->getPid()==2212) continue;
 
                 runno = c12.runconfig()->getRun(); // Getting the run number
                 Status = p->par()->getStatus(); // Getting the status
