@@ -41,8 +41,8 @@ void SetLorentzVector(TLorentzVector &p4,clas12::region_part_ptr rp){
 void FTOF_2pi_Missing_Proton(){
 
   // Data files to process
-  // TString inputFile1("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/*.hipo");
-  TString inputFile1("/volatile/clas12/rg-a/production/recon/spring2019/torus-1/pass1/v2/dst/train/skim4/*.hipo");
+  TString inputFile1("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/*.hipo");
+  // TString inputFile1("/volatile/clas12/rg-a/production/recon/fall2018/torus+1/pass1/v2/calib/train/skim4/*.hipo");
   // TString inputFile1("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_005117.hipo");
   // TString inputFile2("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_005124.hipo");
   // TString inputFile3("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_005125.hipo");
@@ -81,12 +81,13 @@ void FTOF_2pi_Missing_Proton(){
   // Gets total events in all files for run dependence binning
   Int_t Bins = files->GetEntries();
   // Output file location and name
-  TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGA_SPRING2019_skim4_Inbending_2pi_missproton_20072021_01.root","recreate");
+  TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGA_FALL2018_skim4_Inbending_2pi_missproton_31082021_01.root","recreate");
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Create histograms here
   // 2 pi event histograms
   auto* hmass=new TH1F("hmass","Missing Mass e' #pi^{+} #pi^{-};MM(e #pi^{+} #pi^{-}) [GeV];Counts",200,0,2);
+  auto* hmass_cuts=new TH1F("hmass_cuts","Missing Mass e' p #pi^{-};MM(e'p #pi^{-}) [GeV];Counts",200,0,2);
   auto* hdeltaP=new TH1F("DeltaMomentum","Momentum difference of p detected and reconstructed;#Delta P [GeV];Counts",400,-2,2);
   auto* hdeltaTheta=new TH1F("DeltaTheta","#theta difference of p detected and reconstructed;#Delta #theta [deg];Counts",360,-180,180);
   auto* hdeltaPhi=new TH1F("DeltaPhi","#phi difference of p detected and reconstructed;#Delta #phi [deg];Counts",360,-180,180);
@@ -139,13 +140,34 @@ void FTOF_2pi_Missing_Proton(){
         Tracks_name_stream<<"h_Tracks_Det_"<<i_detector<<"_Charge_"<<i_charge<<"_Sec_"<<i_sector;
 
         // Defining the histogram title strings
-        if (i_detector==0) Traj_title_stream<<"Trajectories FTOF1A Charge "<<2*i_charge-1<<" Sec "<<i_sector+1<<"; Run no.; L [cm]";
-        else if (i_detector==1) Traj_title_stream<<"Trajectories FTOF2 Charge "<<2*i_charge-1<<" Sec "<<i_sector+1<<"; Run no.; L [cm]";
-        else if (i_detector==2) Traj_title_stream<<"Trajectories FTOF2 Charge "<<2*i_charge-1<<" Sec "<<i_sector+1<<"; Run no.; L [cm]";
+        if (i_detector==0){
+          Traj_title_stream<<"Trajectories FTOF1A Charge "<<2*i_charge-1<<" Sec "<<i_sector+1<<"; Run no.; L [cm]";
 
-        //convert the stringstream to a string and define our histograms in each element of the array
-        h_Trajectories[i_detector][i_charge][i_sector] = new TH3F(Traj_name_stream.str().c_str(),"", Bins,0,Bins,90,0,900, 50, -250 , 250);
-        h_Tracks[i_detector][i_charge][i_sector] = new TH3F(Tracks_name_stream.str().c_str(),"", Bins,0,Bins,90,0,900, 50, -250 , 250);
+          //convert the stringstream to a string and define our histograms in each element of the array
+          h_Trajectories[i_detector][i_charge][i_sector] = new TH3F(Traj_name_stream.str().c_str(),"", Bins,0,Bins, 25, 61.98, 441.48, 50, -250, 250);
+          h_Tracks[i_detector][i_charge][i_sector] = new TH3F(Tracks_name_stream.str().c_str(),"", Bins,0,Bins, 25, 61.98, 441.48, 50, -250 , 250);
+          // h_Trajectories[i_detector][i_charge][i_sector] = new TH3F(Traj_name_stream.str().c_str(),"", Bins,0,Bins, 1000, 50, 450, 50, -250, 250);
+          // h_Tracks[i_detector][i_charge][i_sector] = new TH3F(Tracks_name_stream.str().c_str(),"", Bins,0,Bins, 1000, 50, 450, 50, -250 , 250);
+
+        }
+        else if (i_detector==1){
+          Traj_title_stream<<"Trajectories FTOF1B Charge "<<2*i_charge-1<<" Sec "<<i_sector+1<<"; Run no.; L [cm]";
+
+          //convert the stringstream to a string and define our histograms in each element of the array
+          h_Trajectories[i_detector][i_charge][i_sector] = new TH3F(Traj_name_stream.str().c_str(),"", Bins,0,Bins, 65, 46.04, 443.84, 50, -250, 250);
+          h_Tracks[i_detector][i_charge][i_sector] = new TH3F(Tracks_name_stream.str().c_str(),"", Bins,0,Bins, 65, 46.04, 443.84, 50, -250 , 250);
+          // h_Trajectories[i_detector][i_charge][i_sector] = new TH3F(Traj_name_stream.str().c_str(),"", Bins,0,Bins, 1000, 40, 450, 50, -250, 250);
+          // h_Tracks[i_detector][i_charge][i_sector] = new TH3F(Tracks_name_stream.str().c_str(),"", Bins,0,Bins, 1000, 40, 450, 50, -250 , 250);
+        }
+        else if (i_detector==2){
+          Traj_title_stream<<"Trajectories FTOF2 Charge "<<2*i_charge-1<<" Sec "<<i_sector+1<<"; Run no.; L [cm]";
+
+          //convert the stringstream to a string and define our histograms in each element of the array
+          h_Trajectories[i_detector][i_charge][i_sector] = new TH3F(Traj_name_stream.str().c_str(),"", Bins,0,Bins, 7, 693, 847, 50, -250, 250);
+          h_Tracks[i_detector][i_charge][i_sector] = new TH3F(Tracks_name_stream.str().c_str(),"", Bins,0,Bins, 7, 693, 847, 50, -250 , 250);
+          // h_Trajectories[i_detector][i_charge][i_sector] = new TH3F(Traj_name_stream.str().c_str(),"", Bins,0,Bins, 500, 690, 850, 50, -250, 250);
+          // h_Tracks[i_detector][i_charge][i_sector] = new TH3F(Tracks_name_stream.str().c_str(),"", Bins,0,Bins, 500, 690, 850, 50, -250 , 250);
+        }
 
         // Setting the title for each histogram as it did not work when put in the lines above
         h_Trajectories[i_detector][i_charge][i_sector]->SetTitle(Traj_title_stream.str().c_str());
@@ -239,13 +261,14 @@ void FTOF_2pi_Missing_Proton(){
         // Looking at positive particles
         else if(p->par()->getCharge() > 0){
           positive++;
-          proton.SetXYZM(p->par()->getPx(),p->par()->getPy(),p->par()->getPz(),db->GetParticle(2212)->Mass());
-
+          if(p->par()->getPid() != 211){
+            proton.SetXYZM(p->par()->getPx(),p->par()->getPy(),p->par()->getPz(),db->GetParticle(2212)->Mass());
+          }
         }
       }
 
       // Getting 2pi events
-      if(electrons.size() == 1 && pips.size() == 1 && pims.size() == 1 && negative == 2){
+      if(electrons.size() == 1 && pips.size() == 1 && pims.size() == 1 && negative == 2 && positive == 2){
 
         // Cuts on proton momentum to check momentum dependence
         // if(proton.Rho() < 0.0 || proton.Rho() > 1.5)continue;
