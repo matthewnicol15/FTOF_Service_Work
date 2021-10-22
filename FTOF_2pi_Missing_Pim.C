@@ -1,3 +1,9 @@
+// Here you can set the various cuts and polarities required for your analysis
+Double_t DC_Fiducial_Cuts = 0; // DC fiducial cuts off = 0, Inbending = 1, Outbending = 2
+Double_t Beta_Cut = 0; // Beta cut off = 0, on = 1
+Double_t Calorimeter_Cut = 0; // Calorimeter cut off = 0, on = 1
+Double_t FTOF_Fiducial_Cuts = 0; // FTOF fiducial cuts = 0 off, loose = 1, tight = 2 (in development)
+
 #include "DC_Fiducial_Cuts_CLAS12.cxx"
 #include <iostream>
 #include <cstdlib>
@@ -29,55 +35,28 @@
 
 using namespace clas12;
 
+// Define SetLorentzVector for four vectors of particles
 void SetLorentzVector(TLorentzVector &p4,clas12::region_part_ptr rp){
   p4.SetXYZM(rp->par()->getPx(),rp->par()->getPy(),
   rp->par()->getPz(),p4.M());
 
 }
 
+// Loading macro
 void FTOF_2pi_Missing_Pim(){
 
-  // Data files to process
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Defining input and output files
 
-  TString inputFile1("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_005038.hipo");
-  // TString inputFile1("/volatile/clas12/rg-a/production/recon/fall2018/torus+1/pass1/v2/calib/train/skim4/*.hipo");
-  // TString inputFile1("/lustre19/expphy/volatile/clas12/rg-a/production/recon/fall2018/torus+1/pass1/v1/dst/train/skim4/*.hipo");
-  // TString inputFile1("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_005117.hipo");
-  // TString inputFile2("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_005124.hipo");
-  // TString inputFile3("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_005125.hipo");
-  // TString inputFile4("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_005126.hipo");
-  // TString inputFile5("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_005128.hipo");
-  // TString inputFile6("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_005130.hipo");
+  // Data files to process
+  // TString inputFile1("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/*.hipo");
+  TString inputFile1("/volatile/clas12/rg-a/production/recon/fall2018/torus+1/pass1/v2/calib/train/skim4/*.hipo");
+
 
   // Creating a TChain of all the input files
   TChain fake("hipo");
   // Adding the different input files to the TChain
   fake.Add(inputFile1.Data());
-  // fake.Add(inputFile2.Data());
-  // fake.Add(inputFile3.Data());
-  // fake.Add(inputFile4.Data());
-  // fake.Add(inputFile5.Data());
-  // fake.Add(inputFile6.Data());
-
-
-  // Access information from PDG e.g. particle masses
-  auto db=TDatabasePDG::Instance();
-  TLorentzVector beam(0,0,10.6,10.6); // beam Px,Py,Pz,E
-
-  // TLorentzVector target(0,0,0,1.8756); // target Px,Py,Pz,E
-  TLorentzVector target(0,0,0,db->GetParticle(2212)->Mass()); // target Px,Py,Pz,E
-
-
-  TLorentzVector el(0,0,0,db->GetParticle(11)->Mass()); // scattered e^- Px,Py,Pz,E
-  TLorentzVector pr(0,0,0,db->GetParticle(2212)->Mass()); // proton Px,Py,Pz,E
-  TLorentzVector pip(0,0,0,db->GetParticle(211)->Mass()); // pi^+ Px,Py,Pz,E
-
-  Int_t part_pid;
-
-  // x,y,z positions for 3 DC layers
-  Double_t part_DC_c1x,part_DC_c1y,part_DC_c1z;
-  Double_t part_DC_c2x,part_DC_c2y,part_DC_c2z;
-  Double_t part_DC_c3x,part_DC_c3y,part_DC_c3z;
 
   // Retrieving list of files
   auto files=fake.GetListOfFiles();
@@ -85,7 +64,70 @@ void FTOF_2pi_Missing_Pim(){
   Int_t Bins = files->GetEntries();
   // Output file location and name
 
-  TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGA_FALL2018_skim4_5038_Inbending_2pi_misspim_withoutcuts_18102021_01.root","recreate");
+  TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGA_FALL2018_skim4_Outbending_2pi_misspim_withoutcuts_highbinning_20102021_01.root","recreate");
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Creating vectors and variables
+
+  // Access information from PDG e.g. particle masses
+  auto db=TDatabasePDG::Instance();
+
+  // Define beam and target
+  TLorentzVector beam(0,0,10.6,10.6); // beam Px,Py,Pz,E
+  // TLorentzVector target(0,0,0,1.8756); // target Px,Py,Pz,E
+  TLorentzVector target(0,0,0,db->GetParticle(2212)->Mass()); // target Px,Py,Pz,E
+
+  // Creating TLorentzVectors for detected particles
+  TLorentzVector el(0,0,0,db->GetParticle(11)->Mass()); // scattered e^- Px,Py,Pz,E
+  TLorentzVector pr(0,0,0,db->GetParticle(2212)->Mass()); // proton Px,Py,Pz,E
+  TLorentzVector pip(0,0,0,db->GetParticle(211)->Mass()); // pi^+ Px,Py,Pz,E
+
+  // Defining variables required for DC fiducial cut
+  // PID value
+  Int_t part_pid;
+
+  // x,y,z positions for 3 DC layers
+  Double_t part_DC_c1x,part_DC_c1y,part_DC_c1z;
+  Double_t part_DC_c2x,part_DC_c2y,part_DC_c2z;
+  Double_t part_DC_c3x,part_DC_c3y,part_DC_c3z;
+
+  // Positions and angles
+  Double_t x_1a, x_1b, x_2, y_1a, y_1b, y_2, z_1a, z_1b, z_2; // DC trajectory x,y,z positions
+  Double_t d_1a, d_1b, d_2; // Distance to xy position (used for calculating perpendicular distance)
+  Double_t x_FTOF, y_FTOF, z_FTOF; // Scintillator x,y,z positions
+  Double_t L_1a, L_1b, L_2; // Distance from beam to point at centre of counter
+  Double_t L_det_1a, L_det_1b, L_det_2; // Distance from beam to point in plane of FTOF layer (e.g FTOF1A/B 25 deg to xy plane)
+  Double_t alpha_1a, alpha_1b, alpha_2; // angle to hit (used to determine sector)
+  Double_t L_Perp_1a, L_Perp_1b, L_Perp_2; // Distance from centre of counter to hit
+  Double_t L_Theta = 60; // Angle at middle of sector (check if hit is left or right of the middle of the sector)
+  Double_t radia_residual; // Distance between DC trajectory and scintillator hit
+
+  Double_t Component; // Getting specific counter hit in scintillator
+
+  // Calorimeter information
+  Double_t PCAL_Energy, ECIN_Energy, ECOUT_Energy; // ECAL energy depositions
+
+  // Timing and beta
+  Double_t beta = 0;
+  Double_t start_time = 0;
+  Double_t Momentum = 0;
+
+  // Reconstructed pi^-
+  TLorentzVector misspim;
+  // Detected negative particle set to pi^-
+  TLorentzVector pim;
+
+  // Event information
+  Int_t runno; // Run number
+  vector<TString> v_Runno; // vector of run numbers turned into strings
+  Int_t Binno = 0; // Count total files this corresponds to the number of x bins
+  Int_t Runs = files->GetEntries(); // Count total files this corresponds to the number of x bins
+
+
+  // Particle numbers for 2pi events
+  Int_t negative, positive, nonelectron;
+  // Creating variables for comparing detected and missing pion
+  Double_t DeltaP, DeltaTheta, DeltaPhi;
 
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -93,170 +135,119 @@ void FTOF_2pi_Missing_Pim(){
 
   // 2 pi event histograms
   auto* hmass=new TH1F("hmass","Missing Mass e' p #pi^{+};MM(e'p#pi^{+}) [GeV];Counts",200,-1,1);
-  auto* hmass_L_1a=new TH2D("hmass_L_1a","Missing Mass squared e' p #pi^{+}; L [cm]; MM^{2}(e'p #pi^{+}) [GeV]",500,0,500, 200,-1,1);
-  auto* hmass_L_1b=new TH2D("hmass_L_1b","Missing Mass squared e' p #pi^{+}; L [cm]; MM^{2}(e'p #pi^{+}) [GeV]",500,0,500, 200,-1,1);
-  auto* hmass_cuts=new TH1F("hmass_cuts","Missing Mass e' p #pi^{+};MM(e'p#pi^{+}) [GeV];Counts",200,-1,1);
   auto* hdeltaP=new TH1F("DeltaMomentum","Momentum difference of #pi^{-} detected and reconstructed;#Delta P [GeV];Counts",400,-2,2);
   auto* hdeltaTheta=new TH1F("DeltaTheta","#theta difference of #pi^{-} detected and reconstructed;#Delta #theta [deg];Counts",360,-180,180);
   auto* hdeltaPhi=new TH1F("DeltaPhi","#phi difference of #pi^{-} detected and reconstructed;#Delta #phi [deg];Counts",360,-180,180);
 
-  auto* hxy = new TH2F("hxy","xy",1000,-500,500,1000,-500,500);
-
-  // Checking the counter vs L
+  // Checking the counter number vs L
   auto* hlvscounter1A=new TH2F("hlvscounter1A","L vs counter FTOF1A;Counter;L [cm]",24,0,24,500,0,500);
   auto* hlvscounter1B=new TH2F("hlvscounter1B","L vs counter FTOF1B;Counter;L [cm]",63,0,63,500,0,500);
   auto* hlvscounter2=new TH2F("hlvscounter2","L vs counter FTOF2;Counter;L [cm]",6,0,6,300,600,900);
 
-  // Look at momentum distribution of particles
+  // Particle information
   auto* hMomentum_1A_p=new TH1F("hMomentum_1A_p", "Momentum of positive tracks in FTOF1A; Momentum [GeV/c]; Counts;", 200,0,8);
   auto* hMomentum_1B_p=new TH1F("hMomentum_1B_p", "Momentum of positive tracks in FTOF1A; Momentum [GeV/c]; Counts;", 200,0,8);
   auto* hMomentum_2_p=new TH1F("hMomentum_2_p", "Momentum of positive tracks in FTOF1A; Momentum [GeV/c]; Counts;", 200,0,8);
   auto* hMomentum_1A_n=new TH1F("hMomentum_1A_n", "Momentum of negative tracks in FTOF1A; Momentum [GeV/c]; Counts;", 200,0,8);
   auto* hMomentum_1B_n=new TH1F("hMomentum_1B_n", "Momentum of negative tracks in FTOF1A; Momentum [GeV/c]; Counts;", 200,0,8);
   auto* hMomentum_2_n=new TH1F("hMomentum_2_n", "Momentum of negative tracks in FTOF1A; Momentum [GeV/c]; Counts;", 200,0,8);
-  auto* hEnergy_1a=new TH1F("hEnergy_1a","Energy 1A",510,-10,500);
-  auto* hEnergy_1b=new TH1F("hEnergy_1b","Energy 1A",510,-10,500);
   auto *h_z_vertex=new TH1D("h_z_vertex","z vertex",100,-15,15);
   auto *h_Pid=new TH1D("h_Pid","PID after cuts",10000,-5000,5000);
-
-  // Histograms for timing
-  auto* h_PCAL_time=new TH1F("h_PCAL_time","PCAL time;time [ns];Counts",400,0,200);
-  auto* h_PCAL_beta=new TH2D("h_PCAL_beta","PCAL beta;P [GeV];beta",1100,0,11,400,-2,2);
-  auto* h_TOF=new TH1F("h_TOF","PCAL TOF;time [ns];Counts",400,0,200);
   auto* h_beta=new TH2D("h_beta","beta;P [GeV];beta",1100,0,11,400,-2,2);
-  auto* h_PCAL_path=new TH1F("h_PCAL_path","PCAL path;path [cm];Counts",1000,0,1000);
-  auto* h_FTOF_time_1A=new TH1F("h_FTOF_time_1A","FTOF1A time;time [ns];Counts",400,0,200);
-  auto* h_FTOF_time_1B=new TH1F("h_FTOF_time_1B","FTOF1A time;time [ns];Counts",400,0,200);
+
+  // Event information
   auto* h_start_time=new TH1F("h_start_time","Start time;Start time [ns];Counts",400,0,200);
 
-  // Arrays of histograms [layer][charge][sector]
-  TH3F *h_Trajectories[3][2][6]; // Trajectories from DC
-  TH3F *h_Tracks[3][2][6]; // Trajectories from DC with energy deposited in FTOF
-  TH3F *h_Efficiency[3][2][6]; // Tracks divided by Trajectories
+  // Distance between DC trajectory and scintillator hit
+  auto* h_radia_residual_1A = new TH1D("h_radia_residual_1A","Radius Residual FTOF1A",300,0,30);
+  auto* h_radia_residual_1B = new TH1D("h_radia_residual_1B","Radius Residual FTOF1A",300,0,30);
+  auto* h_radia_residual_2 = new TH1D("h_radia_residual_2","Radius Residual FTOF1A",300,0,30);
 
-  // Looping over the FTOF layers
+  // Create arrays of 3d histograms for
+  // Arrays of histograms [layer][charge][sector]
+  TH3F *h_Denominator[3][2][6]; // Trajectories from DC
+  TH3F *h_Numerator[3][2][6]; // Trajectories from DC with energy deposited in FTOF
+  TH3F *h_Efficiency[3][2][6]; // Numerator divided by denominator
+
+  // Looping over the 3 FTOF layers (FTOF1A, FTOF1B and FTOF2)
   for(Int_t i_detector=0;i_detector<3;i_detector++){
     // Looping over negative and positive particles
     for(Int_t i_charge=0;i_charge<2;i_charge++){
-      // Looping over the sectors
+      // Looping over the 6 sectors
       for(Int_t i_sector=0;i_sector<6;i_sector++){
 
-        //create a string which we can append integers to, which allows us to define a number of histograms in a for loop
+        //create a string which we can append integers to,
+        // allows us to define a number of histograms in a for loop
+
         // Histogram names
-        ostringstream Traj_name_stream;
-        ostringstream Tracks_name_stream;
+        ostringstream Denominator_name_stream;
+        ostringstream Numerator_name_stream;
 
         // Histogram Titles
-        ostringstream Traj_title_stream;
-        ostringstream Tracks_title_stream;
+        ostringstream Denominator_title_stream;
+        ostringstream Numerator_title_stream;
 
         // Defining the histogram name strings
-        Traj_name_stream<<"h_Traj_Det_"<<i_detector<<"_Charge_"<<i_charge<<"_Sec_"<<i_sector;
-        Tracks_name_stream<<"h_Tracks_Det_"<<i_detector<<"_Charge_"<<i_charge<<"_Sec_"<<i_sector;
-
-        // Defining the histogram title strings
+        Denominator_name_stream<<"h_Denominator_Det_"<<i_detector<<"_Charge_"<<i_charge<<"_Sec_"<<i_sector;
+        Numerator_name_stream<<"h_Numerator_Det_"<<i_detector<<"_Charge_"<<i_charge<<"_Sec_"<<i_sector;
 
         // FTOF1A
         if (i_detector==0){
           // Define string for histogram title
-          Traj_title_stream<<"Trajectories FTOF1A Charge "<<2*i_charge-1<<" Sec "<<i_sector+1<<"; Run no.; L [cm]";
+          Denominator_title_stream<<"Denominator FTOF1A Charge "<<2*i_charge-1<<" Sec "<<i_sector+1<<"; Run no.; L [cm]";
 
           // Define current histogram in array
           // Average distance between counter centres is 15.18 cm
           // FTOF 1A first counter starts at L = 77.16 cm
           // FTOF 1A last counter ends at L = 426.3 cm
-          h_Trajectories[i_detector][i_charge][i_sector] = new TH3F(Traj_name_stream.str().c_str(),"", Bins,0,Bins, 25, 61.98, 441.48, 50, -250, 250);
-          h_Tracks[i_detector][i_charge][i_sector] = new TH3F(Tracks_name_stream.str().c_str(),"", Bins,0,Bins, 25, 61.98, 441.48, 50, -250 , 250);
+          // h_Denominator[i_detector][i_charge][i_sector] = new TH3F(Denominator_name_stream.str().c_str(),"", Bins,0,Bins, 25, 61.98, 441.48, 50, -250, 250);
+          // h_Numerator[i_detector][i_charge][i_sector] = new TH3F(Numerator_name_stream.str().c_str(),"", Bins,0,Bins, 25, 61.98, 441.48, 50, -250 , 250);
 
+          // High binning to check FTOF geometry
+          h_Denominator[i_detector][i_charge][i_sector] = new TH3F(Denominator_name_stream.str().c_str(),"", Bins,0,Bins, 1000, 61.98, 441.48, 50, -250, 250);
+          h_Numerator[i_detector][i_charge][i_sector] = new TH3F(Numerator_name_stream.str().c_str(),"", Bins,0,Bins, 1000, 61.98, 441.48, 50, -250 , 250);
 
         }
 
         // FTOF1B
         else if (i_detector==1){
           // Define string for histogram title
-          Traj_title_stream<<"Trajectories FTOF1B Charge "<<2*i_charge-1<<" Sec "<<i_sector+1<<"; Run no.; L [cm]";
+          Denominator_title_stream<<"Denominator FTOF1B Charge "<<2*i_charge-1<<" Sec "<<i_sector+1<<"; Run no.; L [cm]";
 
           // Define current histogram in array
           // Average distance between counter centres is 6.12 cm
           // First counter starts at L = 52.16 cm
           // Last counter ends at L = 431.6 cm
-          h_Trajectories[i_detector][i_charge][i_sector] = new TH3F(Traj_name_stream.str().c_str(),"", Bins,0,Bins, 65, 46.04, 443.84, 50, -250, 250);
-          h_Tracks[i_detector][i_charge][i_sector] = new TH3F(Tracks_name_stream.str().c_str(),"", Bins,0,Bins, 65, 46.04, 443.84, 50, -250 , 250);
+          // h_Denominator[i_detector][i_charge][i_sector] = new TH3F(Denominator_name_stream.str().c_str(),"", Bins,0,Bins, 65, 46.04, 443.84, 50, -250, 250);
+          // h_Numerator[i_detector][i_charge][i_sector] = new TH3F(Numerator_name_stream.str().c_str(),"", Bins,0,Bins, 65, 46.04, 443.84, 50, -250 , 250);
 
+          // High binning to check FTOF geometry
+          h_Denominator[i_detector][i_charge][i_sector] = new TH3F(Denominator_name_stream.str().c_str(),"", Bins,0,Bins, 1000, 46.04, 443.84, 50, -250, 250);
+          h_Numerator[i_detector][i_charge][i_sector] = new TH3F(Numerator_name_stream.str().c_str(),"", Bins,0,Bins, 1000, 46.04, 443.84, 50, -250 , 250);
         }
 
         // FTOF2
         else if (i_detector==2){
           // Define string for histogram title
-          Traj_title_stream<<"Trajectories FTOF2 Charge "<<2*i_charge-1<<" Sec "<<i_sector+1<<"; Run no.; L [cm]";
+          Denominator_title_stream<<"Denominator FTOF2 Charge "<<2*i_charge-1<<" Sec "<<i_sector+1<<"; Run no.; L [cm]";
 
           // Define current histogram in array
           // Average distance between counter centres is 22 cm
           // First counter starts at L = 715 cm
           // Last counter ends at L = 825 cm
-          h_Trajectories[i_detector][i_charge][i_sector] = new TH3F(Traj_name_stream.str().c_str(),"", Bins,0,Bins, 7, 693, 847, 50, -250, 250);
-          h_Tracks[i_detector][i_charge][i_sector] = new TH3F(Tracks_name_stream.str().c_str(),"", Bins,0,Bins, 7, 693, 847, 50, -250 , 250);
+          h_Denominator[i_detector][i_charge][i_sector] = new TH3F(Denominator_name_stream.str().c_str(),"", Bins,0,Bins, 500, 693, 847, 50, -250, 250);
+          h_Numerator[i_detector][i_charge][i_sector] = new TH3F(Numerator_name_stream.str().c_str(),"", Bins,0,Bins, 500, 693, 847, 50, -250 , 250);
         }
 
 
         // Setting the title for each histogram
-        h_Trajectories[i_detector][i_charge][i_sector]->SetTitle(Traj_title_stream.str().c_str());
-        h_Tracks[i_detector][i_charge][i_sector]->SetTitle(Tracks_title_stream.str().c_str());
+        h_Denominator[i_detector][i_charge][i_sector]->SetTitle(Denominator_title_stream.str().c_str());
+        h_Numerator[i_detector][i_charge][i_sector]->SetTitle(Numerator_title_stream.str().c_str());
       }
     }
   }
 
-  // Distance between trajectory point and scintillator hit
-  auto* h_radia_residual_1A = new TH1D("h_radia_residual_1A","Radius Residual FTOF1A",300,0,30);
-  auto* h_radia_residual_1B = new TH1D("h_radia_residual_1B","Radius Residual FTOF1A",300,0,30);
-  auto* h_radia_residual_2 = new TH1D("h_radia_residual_2","Radius Residual FTOF1A",300,0,30);
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // Creating variables for different layers of FTOF
-
-  // Positions and angles
-  Double_t x_1a, x_1b, x_2, y_1a, y_1b, y_2, z_1a, z_1b, z_2; // DC trajectory x,y,z positions
-  Double_t d_1a, d_1b, d_2; // Distance to xy position (used for calculating perpendicular distance)
-  Double_t x_FTOF, y_FTOF, z_FTOF; // Scintillator x,y,z positions
-  Double_t L_1a, L_1b, L_2; // Perpendicular distance to sector in lab frame
-  Double_t L_det_1a, L_det_1b, L_det_2; // Perpendicular distance to sector in detector frame
-
-  Double_t alpha_1a, alpha_1b, alpha_2; // angle to hit (used to determine sector)
-  Double_t L_Perp_1a, L_Perp_1b, L_Perp_2; // Distance along counter
-  Double_t L_Theta; // Angle at middle of sector (check if hit is left or right of the middle of the sector)
-  Double_t radia_residual; // Distance between trajectory bank and scintillator hit
-
-  Double_t Component; // Getting specific counter hit in scintillator
-
-  // Energy Values
-  Double_t FTOF_1A_Energy, FTOF_1B_Energy, FTOF_1_Energy, FTOF_2_Energy; // FTOF energy depositions
-  Double_t PCAL_Energy, ECIN_Energy, ECOUT_Energy, ECAL_Energy; // ECAL energy depositions
-
-  // Timing and beta
-  Double_t PCAL_Time = 0;
-  Double_t PCAL_path = 0;
-  Double_t PCAL_beta = 0;
-  Double_t beta = 0;
-  Double_t start_time = 0;
-  Double_t TOF = 0;
-  Double_t Momentum = 0;
-
-  // Missing pim
-  TLorentzVector misspim;
-  // Negative particle set to pi^-
-  TLorentzVector pim;
-
-  // Run Number
-  Int_t runno; // runno as a integer
-  vector<TString> v_Runno; // runno as a vector of string
-  Int_t Binno=0; // Count the number of files this corresponds to the number of x bins
-  // Status
-  Int_t Status, Calorimeter_Hits; // Status is used to find out if there is a ECAL hit
-
-  // Particle numbers for 2pi events
-  Int_t negative, positive, nonelectron;
-  // Creating variables for comparing detected and missing pion
-  Double_t DeltaP, DeltaTheta, DeltaPhi;
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // 1st Loop over data to find 2pi events
 
@@ -268,19 +259,23 @@ void FTOF_2pi_Missing_Pim(){
     //create the event reader
     clas12reader c12(files->At(i)->GetTitle());
 
+    // Looping over events in the current file
     while(c12.next()==true){
-      // Used to access the particle bank for each event
+
+      // Access the particle bank for each event
       auto particles = c12.getDetParticles();
 
       // Setting variables to zero at start  of each event
-      negative = 0;
-      positive = 0;
-      nonelectron = 0;
-      DeltaP = 0;
-      DeltaTheta = 0;
-      DeltaPhi = 0;
+      negative = 0; // Number of negatives in event
+      positive = 0; // Number of positives in event
+      nonelectron = 0; // Number of negatives that aren't electrons
 
+      // Differences between detected negative and reconstructed pi^-
+      DeltaP = 0; // Momentum
+      DeltaTheta = 0; // Theta
+      DeltaPhi = 0; // Phi
 
+      // Use event builder PID to grab particles
       auto electrons=c12.getByID(11);
       auto protons=c12.getByID(2212);
       auto pips=c12.getByID(211);
@@ -290,46 +285,39 @@ void FTOF_2pi_Missing_Pim(){
 
         // Looking at negative particles
         if(p->par()->getCharge() < 0){
+
           // negative particles not electron are set to pi^-
           if(p->par()->getPid() != 11){
-            nonelectron++;
+            nonelectron++; // Count the number of negatives excluding electrons
             pim.SetXYZM(p->par()->getPx(),p->par()->getPy(),p->par()->getPz(),db->GetParticle(-211)->Mass());
           }
         }
+
         // Looking at positive particles
-        else if(p->par()->getCharge() > 0) positive++;
+        else if(p->par()->getCharge() > 0) positive++; // Count positive particles in this event
       }
 
       // Getting 2pi events
       if(nonelectron == 1 && electrons.size() == 1 && protons.size() == 1 && pips.size() == 1 && positive == 2)
       {
-        // cout<<pim.Rho()<<endl;
-        // Apply cut on pion momentum to look at momentum dependence
-        // if(pim.Rho()<2.5 /*|| pim.Rho()>2.5*/)continue;
-        // cout<<"test "<<pim.Rho()<<endl;
 
-
-
+        // Setting the four vectors
         SetLorentzVector(el,electrons[0]);
         SetLorentzVector(pr,protons[0]);
         SetLorentzVector(pip,pips[0]);
 
+        // Putting chi^2 PID cut on detected particles
         if(fabs(electrons[0]->par()->getChi2Pid())>3 || fabs(protons[0]->par()->getChi2Pid())>3 || fabs(pips[0]->par()->getChi2Pid())>3)continue;
 
-
+        // Reconstructed pi^-
         misspim = beam + target - el - pr - pip;
         hmass->Fill(misspim.M2());
 
+        // Differences between detected negative and reconstructed pi^-
         DeltaP = misspim.Rho() - pim.Rho();
         DeltaTheta = TMath::RadToDeg()* (misspim.Theta() - pim.Theta());
         DeltaPhi = TMath::RadToDeg()* (misspim.Phi() - pim.Phi());
 
-
-        // Checking the background after cuts
-        if(fabs(DeltaP) < 0.3 && fabs(DeltaTheta) < 10 && fabs(DeltaPhi) < 10 ){
-
-          hmass_cuts->Fill(misspim.M2());
-        }
 
         // Cut on missing mass of the pi^-
         if(misspim.M2() > - 0.1 && misspim.M2() < 0.2){
@@ -340,7 +328,7 @@ void FTOF_2pi_Missing_Pim(){
           hdeltaTheta->Fill(DeltaTheta);
           hdeltaPhi->Fill(DeltaPhi);
 
-          // Other cuts to be applied and tuned
+          // Cuts to delta P, theta and phi to select true pi^-
           if(fabs(DeltaP) < 0.3 && fabs(DeltaTheta) < 10 && fabs(DeltaPhi) < 10 ){
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -358,28 +346,21 @@ void FTOF_2pi_Missing_Pim(){
                 // Increase the particle index with each loop of the particles
                 pindex++;
 
-                //Ignore the first particle (trigger), any neutrals and electron
+                //Ignore the first particle (trigger), any neutrals, positives and electrons
                 if (pindex==1 || p->par()->getCharge()==0 ||  p->par()->getCharge() > 0 || p->par()->getPid()==11) continue;
 
                 runno = c12.runconfig()->getRun(); // Getting the run number
-                Status = p->par()->getStatus(); // Getting the status
 
                 // Checking the z vertex before applying a cut
                 h_z_vertex->Fill(p->par()->getVz());
                 if(p->par()->getVz() > 2 || p->par()->getVz() < -9)continue;
 
-                // Setting all energy values to zero
-                FTOF_1A_Energy = 0;
-                FTOF_1B_Energy = 0;
-                FTOF_2_Energy = 0;
+                // Setting calorimeter energy values to zero
                 PCAL_Energy = 0;
                 ECIN_Energy = 0;
                 ECOUT_Energy = 0;
 
-                // Setting the energy values to a double
-                if(p->sci(FTOF1A)->getEnergy()) FTOF_1A_Energy = p->sci(FTOF1A)->getEnergy();
-                if(p->sci(FTOF1B)->getEnergy()) FTOF_1B_Energy = p->sci(FTOF1B)->getEnergy();
-                if(p->sci(FTOF2)->getEnergy()) FTOF_2_Energy = p->sci(FTOF2)->getEnergy();
+                // Grabbing the energy deposited in the 3 calorimeter layers
                 if(p->cal(PCAL)->getEnergy()) PCAL_Energy = p->cal(PCAL)->getEnergy();
                 if(p->cal(ECIN)->getEnergy()) ECIN_Energy = p->cal(ECIN)->getEnergy();
                 if(p->cal(ECOUT)->getEnergy()) ECOUT_Energy = p->cal(ECOUT)->getEnergy();
@@ -387,87 +368,92 @@ void FTOF_2pi_Missing_Pim(){
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // DC fiducial cuts
 
-                // if(( p->traj(DC,6)->getLayer() != 6 || p->traj(DC,18)->getLayer() != 18 || p->traj(DC,36)->getLayer() != 36))continue;
-                //
-                // if(p->traj(DC,6)->getDetector() == 6 && p->traj(DC,6)->getLayer() == 6){
-                //   part_DC_c1x = p->traj(DC,6)->getX();
-                //   part_DC_c1y = p->traj(DC,6)->getY();
-                //   part_DC_c1z = p->traj(DC,6)->getZ();
-                // }
-                // if(p->traj(DC,18)->getDetector() == 6 && p->traj(DC,18)->getLayer() == 18){
-                //   part_DC_c2x = p->traj(DC,18)->getX();
-                //   part_DC_c2y = p->traj(DC,18)->getY();
-                //   part_DC_c2z = p->traj(DC,18)->getZ();
-                // }
-                // if(p->traj(DC,36)->getDetector() == 6 && p->traj(DC,36)->getLayer() == 36){
-                //   part_DC_c3x = p->traj(DC,36)->getX();
-                //   part_DC_c3y = p->traj(DC,36)->getY();
-                //   part_DC_c3z = p->traj(DC,36)->getZ();
-                // }
-                //
-                // part_pid = 0;
-                // // Positive particles asssigned to pi^+, negative to pi^-
-                //
-                // if(p->par()->getPid())
-                // part_pid = p->par()->getPid();
-                //
-                // else if(p->par()->getCharge()>0) part_pid = 2;
-                // else if(p->par()->getCharge()<0) part_pid = 3;
-                //
-                // int part_DC_sector = determineSector(part_DC_c2x, part_DC_c2y,part_DC_c2z);
-                //
-                // // Use this cut if looking at inbending data
-                // // if(!DC_fiducial_cut_theta_phi(part_DC_c1x,part_DC_c1y,part_DC_c1z,part_DC_c2x, part_DC_c2y, part_DC_c2z,part_DC_c3x,part_DC_c3y, part_DC_c3z,part_pid,part_DC_sector,1) ||
-                // // !DC_fiducial_cut_theta_phi(part_DC_c1x,part_DC_c1y,part_DC_c1z,part_DC_c2x, part_DC_c2y, part_DC_c2z,part_DC_c3x,part_DC_c3y, part_DC_c3z,part_pid,part_DC_sector,2) ||
-                // // !DC_fiducial_cut_theta_phi(part_DC_c1x,part_DC_c1y,part_DC_c1z,part_DC_c2x, part_DC_c2y, part_DC_c2z,part_DC_c3x, part_DC_c3y, part_DC_c3z,part_pid,part_DC_sector,3))continue;
-                //
-                // // Use this cut if looking at outbending data
-                // if(!DC_fiducial_cut_XY(part_DC_c1x,part_DC_c1y,part_DC_c1z,part_DC_c2x, part_DC_c2y, part_DC_c2z,part_DC_c3x, part_DC_c3y, part_DC_c3z,part_pid,part_DC_sector,1) ||
-                // !DC_fiducial_cut_XY(part_DC_c1x,part_DC_c1y,part_DC_c1z,part_DC_c2x, part_DC_c2y, part_DC_c2z,part_DC_c3x, part_DC_c3y, part_DC_c3z, part_pid,part_DC_sector,2) ||
-                // !DC_fiducial_cut_XY(part_DC_c1x,part_DC_c1y,part_DC_c1z,part_DC_c2x, part_DC_c2y, part_DC_c2z,part_DC_c3x, part_DC_c3y, part_DC_c3z, part_pid,part_DC_sector,3)) continue;
-                //
+                // Check if DC cuts are on
+                if(DC_Fiducial_Cuts != 0){
 
+                  // Require hit in three layers of DC
+                  if((p->traj(DC,6)->getLayer() != 6 || p->traj(DC,18)->getLayer() != 18 || p->traj(DC,36)->getLayer() != 36))continue;
+
+                  // Get co-ordinates for layer 6
+                  if(p->traj(DC,6)->getDetector() == 6 && p->traj(DC,6)->getLayer() == 6){
+                    part_DC_c1x = p->traj(DC,6)->getX();
+                    part_DC_c1y = p->traj(DC,6)->getY();
+                    part_DC_c1z = p->traj(DC,6)->getZ();
+                  }
+                  // Get co-ordinates for layer 18
+                  if(p->traj(DC,18)->getDetector() == 6 && p->traj(DC,18)->getLayer() == 18){
+                    part_DC_c2x = p->traj(DC,18)->getX();
+                    part_DC_c2y = p->traj(DC,18)->getY();
+                    part_DC_c2z = p->traj(DC,18)->getZ();
+                  }
+                  // Get co-ordinates for layer 36
+                  if(p->traj(DC,36)->getDetector() == 6 && p->traj(DC,36)->getLayer() == 36){
+                    part_DC_c3x = p->traj(DC,36)->getX();
+                    part_DC_c3y = p->traj(DC,36)->getY();
+                    part_DC_c3z = p->traj(DC,36)->getZ();
+                  }
+
+                  // Reset PID value to zero each loop
+                  part_pid = 0;
+
+                  // If there is a PID value then it is taken from particle bank
+                  if(p->par()->getPid()) part_pid = p->par()->getPid();
+
+                  // If no PID is assigned to a particle they are assumed to be pions
+                  else if(p->par()->getCharge()>0) part_pid = 2; // Positive particles set to pi^+
+                  else if(p->par()->getCharge()<0) part_pid = 3; // Negative particles set to pi^-
+
+                  // Sector is determined in DC_Fiducial_Cuts_CLAS12.cxx using this function
+                  int part_DC_sector = determineSector(part_DC_c2x, part_DC_c2y,part_DC_c2z);
+
+                  //Checking which polarity to use
+                  if(DC_Fiducial_Cuts == 1){
+                    // Use this cut if looking at inbending data
+                    if(!DC_fiducial_cut_theta_phi(part_DC_c1x,part_DC_c1y,part_DC_c1z,part_DC_c2x, part_DC_c2y, part_DC_c2z,part_DC_c3x,part_DC_c3y, part_DC_c3z,part_pid,part_DC_sector,1) ||
+                    !DC_fiducial_cut_theta_phi(part_DC_c1x,part_DC_c1y,part_DC_c1z,part_DC_c2x, part_DC_c2y, part_DC_c2z,part_DC_c3x,part_DC_c3y, part_DC_c3z,part_pid,part_DC_sector,2) ||
+                    !DC_fiducial_cut_theta_phi(part_DC_c1x,part_DC_c1y,part_DC_c1z,part_DC_c2x, part_DC_c2y, part_DC_c2z,part_DC_c3x, part_DC_c3y, part_DC_c3z,part_pid,part_DC_sector,3))continue;
+                  }
+                  else if(DC_Fiducial_Cuts == 2){
+                    // Use this cut if looking at outbending data
+                    if(!DC_fiducial_cut_XY(part_DC_c1x,part_DC_c1y,part_DC_c1z,part_DC_c2x, part_DC_c2y, part_DC_c2z,part_DC_c3x, part_DC_c3y, part_DC_c3z,part_pid,part_DC_sector,1) ||
+                    !DC_fiducial_cut_XY(part_DC_c1x,part_DC_c1y,part_DC_c1z,part_DC_c2x, part_DC_c2y, part_DC_c2z,part_DC_c3x, part_DC_c3y, part_DC_c3z, part_pid,part_DC_sector,2) ||
+                    !DC_fiducial_cut_XY(part_DC_c1x,part_DC_c1y,part_DC_c1z,part_DC_c2x, part_DC_c2y, part_DC_c2z,part_DC_c3x, part_DC_c3y, part_DC_c3z, part_pid,part_DC_sector,3)) continue;
+                  }
+                }
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-                // Skips any particle with no hits in the calorimeter (only applied to 1A and 2 due to angular coverage)
-                // if(PCAL_Energy > 0 && ECIN_Energy > 0){
-
-                FTOF_1_Energy = FTOF_1A_Energy + FTOF_1B_Energy;
-                ECAL_Energy = PCAL_Energy + ECIN_Energy + ECOUT_Energy;
+                // Check if calorimeter cuts are switched on
+                if(Calorimeter_Cut == 1){
+                  // Only accept particles that deposit energy in PCAL and ECIN
+                  if(PCAL_Energy == 0 || ECIN_Energy == 0) continue;
+                }
 
                 // Defining momentum and beta of particles
                 Momentum = p->par()->getP();
                 beta = p->par()->getBeta();
-                start_time = c12.event()->getStartTime();
                 h_beta->Fill(Momentum,p->par()->getBeta());
 
-                // Removing particles with unphysical beta
-                // if(beta < 0.4 || beta >1.1)continue;
 
-                // PCAL and start time information
-                if(p->cal(PCAL)->getEnergy()){
-                  PCAL_Time = p->cal(PCAL)->getTime();
-                  h_PCAL_time->Fill(PCAL_Time);
-                  TOF = PCAL_Time - start_time;
-                  h_TOF->Fill(TOF);
-                  PCAL_path = p->cal(PCAL)->getPath();
-                  PCAL_beta = (PCAL_path / TOF) / 30.0;
-                  h_PCAL_beta->Fill(Momentum,PCAL_beta);
-                  h_PCAL_path->Fill(PCAL_path);
+                // Check if Beta cut is on
+                if(Beta_Cut == 1){
+                  // Removing particles with unphysical beta
+                  if(beta < 0.4 || beta >1.1)continue;
                 }
 
+                // Getting the start time
+                start_time = c12.event()->getStartTime();
                 h_start_time->Fill(c12.event()->getStartTime());
 
+                // Getting the PID values
                 h_Pid->Fill(p->par()->getPid());
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 //FTOF1A
 
-                // Requiring a hit in FTOF1B
-                // if(p->sci(FTOF1B)->getEnergy()>0){
-
+                // Requiring a DC trajectory in FTOF1A
                 if(p->traj(FTOF,FTOF1A)->getDetector()==12 && p->traj(FTOF,FTOF1A)->getLayer()==1){
+
+                  // Looking at momentum distribution for positive and negative particles
                   if(p->par()->getCharge()>0) hMomentum_1A_p->Fill(p->par()->getP());
                   else if(p->par()->getCharge()<0) hMomentum_1A_n->Fill(p->par()->getP());
 
@@ -476,26 +462,23 @@ void FTOF_2pi_Missing_Pim(){
                   y_1a =  p->traj(FTOF, FTOF1A)->getY();
                   z_1a = p->traj(FTOF, FTOF1A)->getZ();
 
-                  // Getting x-, y- and z- co-ordinates from FTOF hit
+                  // Requiring hit in FTOF1A
                   if(p->sci(FTOF1A)->getEnergy()){
+
+                    // Getting x-, y- and z- co-ordinates from FTOF hit
                     x_FTOF =  p->sci(FTOF1A)->getX();
                     y_FTOF =  p->sci(FTOF1A)->getY();
                     z_FTOF =  p->sci(FTOF1A)->getZ();
-
-                    // FTOF time
-                    h_FTOF_time_1A->Fill(p->sci(FTOF1A)->getTime()-start_time);
-
-                    // if(p->sci(FTOF1A)->getTime()-start_time < 20 || p->sci(FTOF1A)->getTime()-start_time > 40)continue;
 
                     // Distance between DC and FTOF co-ordinates
                     radia_residual = sqrt(pow(x_1a-x_FTOF,2) + pow(y_1a-y_FTOF,2) + pow(z_1a-z_FTOF,2));
                     h_radia_residual_1A->Fill(radia_residual);
                   }
 
-                  // Calculating d, distance to hit from (0,0) to (x,y)
+                  // Calculating distance to DC trajectory from (0,0)
                   d_1a = sqrt(pow(x_1a,2) + pow(y_1a,2));
 
-                  // Calculating alpha, angle from (0,0) to hit
+                  // Calculating alpha, angle from (0,0) to DC trajectory
                   alpha_1a = TMath::RadToDeg()*atan(y_1a/x_1a);
 
                   // Calculating length from (0,0) along centre of sector
@@ -508,213 +491,168 @@ void FTOF_2pi_Missing_Pim(){
                   // Calculating the distance along the width of the counter
                   L_Perp_1a = pow(pow(d_1a,2) - pow(L_1a,2), 0.5);
 
-                  // Loose FTOF1A fiducial cuts
-                  // if(L_det_1a > 77 && L_det_1a < 420.6 && (L_det_1a - (2.1 * fabs(L_Perp_1a))) > 43.09) {
+                  // Checking if FTOF fiducial cuts are on
+                  if(FTOF_Fiducial_Cuts != 0){
 
-                  // Tight FTOF1A fiducial cuts
-                  // if(L_det_1a > 80 && L_det_1a < 410 && (L_det_1a - (2.2 * fabs(L_Perp_1a))) > 58) {
-
-                    // Resetting the component to unphysical value
-                    Component = -10;
-
-                    // Checking if there is energy deposition in FTOF1A
-                    if(p->sci(FTOF1A)->getEnergy()){
-                      // Getting the component number for the counter hit
-                      Component = p->sci(FTOF1A)->getComponent();
-                      // Plotting L vs the counter number
-                      hlvscounter1A->Fill(Component,L_det_1a);
+                    // Loose FTOF1A fiducial cuts
+                    if(FTOF_Fiducial_Cuts == 1){
+                      if(L_det_1a < 77 || L_det_1a > 420.6 || (L_det_1a - (2.1 * fabs(L_Perp_1a))) < 43.09) continue
                     }
 
-                    // Checking background as a function of L
-                    hmass_L_1a->Fill(L_det_1a, misspim.M2());
+                    // Tight FTOF1A fiducial cuts
+                    if(FTOF_Fiducial_Cuts == 2){
+                      if(L_det_1a < 80 || L_det_1a > 410 || (L_det_1a - (2.2 * fabs(L_Perp_1a))) < 58) continue;
+                    }
+                  }
 
-                    // Determine which sector the hit is in using alpha
-                    // Look at positive x (sectors 1,2 and 6)
-                    if(x_1a > 0){
-                      // Sector 2
-                      if(alpha_1a > 30){
-                        // Checking to see which side of the middle the hit is
-                        L_Theta = 60;
-                        if(L_Theta - alpha_1a < 0)L_Perp_1a = - L_Perp_1a;
+                  // Resetting the component to unphysical value
+                  Component = -10;
 
-                        // Positive particles
-                        if(p->par()->getCharge()>0){
-                          h_Trajectories[0][1][1]->Fill(i,L_det_1a, L_Perp_1a);
-                        }
+                  // Checking if there is energy deposition in FTOF1A
+                  if(p->sci(FTOF1A)->getEnergy()){
+                    // Getting the component number for the counter hit
+                    Component = p->sci(FTOF1A)->getComponent();
+                    // Plotting L vs the counter number
+                    hlvscounter1A->Fill(Component,L_det_1a);
+                  }
 
-                        // Negative particles
-                        else if(p->par()->getCharge()<0){
-                          h_Trajectories[0][0][1]->Fill(i,L_det_1a, L_Perp_1a);
-                        }
-                        if(p->sci(FTOF1A)->getEnergy())hEnergy_1a->Fill(p->sci(FTOF1A)->getEnergy());
+                  // Determine which sector the hit is in using alpha
+                  // Look at positive x (sectors 1,2 and 6)
+                  if(x_1a > 0){
 
-                        // Check if there is energy deposited on the scintillator
-                        if(p->sci(FTOF1A)->getEnergy()){
-                          // Positive particles
-                          if(p->par()->getCharge()>0){
-                            h_Tracks[0][1][1]->Fill(i,L_det_1a, L_Perp_1a);
-                          }
+                    // Sector 2
+                    if(alpha_1a > 30){
+                      // Checking to see which side of the middle the hit is
+                      if(L_Theta - alpha_1a < 0) L_Perp_1a = - L_Perp_1a;
 
-                          // Negative particles
-                          else if(p->par()->getCharge()<0){
-                            h_Tracks[0][0][1]->Fill(i,L_det_1a, L_Perp_1a);
-                          }
-                        }
+                      // Positive particles
+                      if(p->par()->getCharge()>0){
+                        h_Denominator[0][1][1]->Fill(i,L_det_1a, L_Perp_1a);
+                        // Check if there is energy deposited on the scintillator for numerator
+                        if(p->sci(FTOF1A)->getEnergy()) h_Numerator[0][1][1]->Fill(i,L_det_1a, L_Perp_1a);
                       }
 
-                      // Sector 1
-                      else if(fabs(alpha_1a) < 30) {
-
-                        if(alpha_1a < 0)L_Perp_1a = - L_Perp_1a;
-
-                        // Positive particles
-                        if(p->par()->getCharge()>0){
-                          h_Trajectories[0][1][0]->Fill(i,L_det_1a, L_Perp_1a);
-                        }
-
-                        // Negative particles
-                        else if(p->par()->getCharge()<0){
-                          h_Trajectories[0][0][0]->Fill(i,L_det_1a, L_Perp_1a);
-                        }
-
-                        // Check if there is energy deposited on the scintillator
-                        if(p->sci(FTOF1A)->getEnergy()){
-                          if(p->par()->getCharge()>0){
-                            h_Tracks[0][1][0]->Fill(i,L_det_1a, L_Perp_1a);
-                          }
-
-                          else if(p->par()->getCharge()<0){
-                            h_Tracks[0][0][0]->Fill(i,L_det_1a, L_Perp_1a);
-                          }
-                        }
-                      }
-
-                      // Sector 6
-
-                      else if(alpha_1a < -30) {
-
-                        L_Theta = 60;
-                        if(L_Theta + alpha_1a < 0)L_Perp_1a = - L_Perp_1a;
-
-                        // Positive particles
-                        if(p->par()->getCharge()>0){
-                          h_Trajectories[0][1][5]->Fill(i,L_det_1a, L_Perp_1a);
-                        }
-
-                        // Negative particles
-                        else if(p->par()->getCharge()<0){
-                          h_Trajectories[0][0][5]->Fill(i,L_det_1a, L_Perp_1a);
-                        }
-
-                        // Check if there is energy deposited on the scintillator
-                        if(p->sci(FTOF1A)->getEnergy()){
-                          if(p->par()->getCharge()>0){
-                            h_Tracks[0][1][5]->Fill(i,L_det_1a, L_Perp_1a);
-                          }
-
-                          else if(p->par()->getCharge()<0){
-                            h_Tracks[0][0][5]->Fill(i,L_det_1a, L_Perp_1a);
-                          }
-                        }
+                      // Negative particles
+                      else if(p->par()->getCharge()<0){
+                        h_Denominator[0][0][1]->Fill(i,L_det_1a, L_Perp_1a);
+                        // Check if there is energy deposited on the scintillator for numerator
+                        if(p->sci(FTOF1A)->getEnergy()) h_Numerator[0][0][1]->Fill(i,L_det_1a, L_Perp_1a);
                       }
                     }
 
-                    // Look at negative x (sectors 3,4 and 5)
-                    else if(x_1a < 0){
+                    // Sector 1
+                    else if(fabs(alpha_1a) < 30) {
 
-                      // Sector 5
+                      if(alpha_1a < 0)L_Perp_1a = - L_Perp_1a;
 
-                      if(alpha_1a > 30){
-
-                        L_Theta = 60;
-                        if(L_Theta - alpha_1a < 0)L_Perp_1a = - L_Perp_1a;
-
-                        // Positive particles
-                        if(p->par()->getCharge()>0){
-                          h_Trajectories[0][1][4]->Fill(i,L_det_1a, L_Perp_1a);
-                        }
-
-                        // Negative particles
-                        else if(p->par()->getCharge()<0){
-                          h_Trajectories[0][0][4]->Fill(i,L_det_1a, L_Perp_1a);
-                        }
-
+                      // Positive particles
+                      if(p->par()->getCharge()>0){
+                        h_Denominator[0][1][0]->Fill(i,L_det_1a, L_Perp_1a);
                         // Check if there is energy deposited on the scintillator
-                        if(p->sci(FTOF1A)->getEnergy()){
-                          if(p->par()->getCharge()>0){
-                            h_Tracks[0][1][4]->Fill(i,L_det_1a, L_Perp_1a);
-                          }
-
-                          else if(p->par()->getCharge()<0){
-                            h_Tracks[0][0][4]->Fill(i,L_det_1a, L_Perp_1a);
-                          }
-                        }
+                        if(p->sci(FTOF1A)->getEnergy()) h_Numerator[0][1][0]->Fill(i,L_det_1a, L_Perp_1a);
                       }
 
-                      // Sector 4
-                      else if(fabs(alpha_1a) < 30) {
-
-                        if(alpha_1a < 0)L_Perp_1a = - L_Perp_1a;
-
-                        // Positive particles
-                        if(p->par()->getCharge()>0){
-                          h_Trajectories[0][1][3]->Fill(i,L_det_1a, L_Perp_1a);
-                        }
-
-                        // Negative particles
-                        else if(p->par()->getCharge()<0){
-                          h_Trajectories[0][0][3]->Fill(i,L_det_1a, L_Perp_1a);
-                        }
-
-                        // Check if there is energy deposited on the scintillator
-                        if(p->sci(FTOF1A)->getEnergy()){
-                          if(p->par()->getCharge()>0){
-                            h_Tracks[0][1][3]->Fill(i,L_det_1a, L_Perp_1a);
-                          }
-
-                          else if(p->par()->getCharge()<0){
-                            h_Tracks[0][0][3]->Fill(i,L_det_1a, L_Perp_1a);
-                          }
-                        }
-                      }
-
-                      // Sector 3
-                      else if(alpha_1a < -30) {
-
-                        L_Theta = 60;
-                        if(L_Theta + alpha_1a < 0)L_Perp_1a = - L_Perp_1a;
-
-                        // Positive particles
-                        if(p->par()->getCharge()>0){
-                          h_Trajectories[0][1][2]->Fill(i,L_det_1a, L_Perp_1a);
-                        }
-
-                        // Negative particles
-                        else if(p->par()->getCharge()<0){
-                          h_Trajectories[0][0][2]->Fill(i,L_det_1a, L_Perp_1a);
-                        }
-
-                        // Check if there is energy deposited on the scintillator
-                        if(p->sci(FTOF1A)->getEnergy()){
-                          if(p->par()->getCharge()>0){
-                            h_Tracks[0][1][2]->Fill(i,L_det_1a, L_Perp_1a);
-                          }
-
-                          else if(p->par()->getCharge()<0){
-                            h_Tracks[0][0][2]->Fill(i,L_det_1a, L_Perp_1a);
-                          }
-                        }
+                      // Negative particles
+                      else if(p->par()->getCharge()<0){
+                        h_Denominator[0][0][0]->Fill(i,L_det_1a, L_Perp_1a);
+                        if(p->sci(FTOF1A)->getEnergy()) h_Numerator[0][0][0]->Fill(i,L_det_1a, L_Perp_1a);
                       }
                     }
-                  // }
+
+                    // Sector 6
+                    else if(alpha_1a < -30) {
+
+                      // Checking if hit is left or right of counter centre
+                      if(L_Theta + alpha_1a < 0) L_Perp_1a = - L_Perp_1a;
+
+                      // Positive particles
+                      if(p->par()->getCharge()>0){
+                        h_Denominator[0][1][5]->Fill(i,L_det_1a, L_Perp_1a);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF1A)->getEnergy()) h_Numerator[0][1][5]->Fill(i,L_det_1a, L_Perp_1a);
+                      }
+
+                      // Negative particles
+                      else if(p->par()->getCharge()<0){
+                        h_Denominator[0][0][5]->Fill(i,L_det_1a, L_Perp_1a);
+                        if(p->sci(FTOF1A)->getEnergy()) h_Numerator[0][0][5]->Fill(i,L_det_1a, L_Perp_1a);
+                      }
+                    }
+                  }
+
+                  // Look at negative x (sectors 3,4 and 5)
+                  else if(x_1a < 0){
+
+                    // Sector 5
+                    if(alpha_1a > 30){
+
+                      // Checking if hit is left or right of conter centre
+                      if(L_Theta - alpha_1a < 0)L_Perp_1a = - L_Perp_1a;
+
+                      // Positive particles
+                      if(p->par()->getCharge()>0){
+                        h_Denominator[0][1][4]->Fill(i,L_det_1a, L_Perp_1a);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF1A)->getEnergy())  h_Numerator[0][1][4]->Fill(i,L_det_1a, L_Perp_1a);
+                      }
+
+                      // Negative particles
+                      else if(p->par()->getCharge()<0){
+                        h_Denominator[0][0][4]->Fill(i,L_det_1a, L_Perp_1a);
+                        if(p->sci(FTOF1A)->getEnergy())  h_Numerator[0][0][4]->Fill(i,L_det_1a, L_Perp_1a);
+                      }
+                    }
+
+                    // Sector 4
+                    else if(fabs(alpha_1a) < 30) {
+
+                      // Checking if hit is left or right of conter centre
+                      if(alpha_1a < 0)L_Perp_1a = - L_Perp_1a;
+
+                      // Positive particles
+                      if(p->par()->getCharge()>0){
+                        h_Denominator[0][1][3]->Fill(i,L_det_1a, L_Perp_1a);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF1A)->getEnergy())  h_Numerator[0][1][3]->Fill(i,L_det_1a, L_Perp_1a);
+                      }
+
+                      // Negative particles
+                      else if(p->par()->getCharge()<0){
+                        h_Denominator[0][0][3]->Fill(i,L_det_1a, L_Perp_1a);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF1A)->getEnergy())  h_Numerator[0][0][3]->Fill(i,L_det_1a, L_Perp_1a);
+                      }
+                    }
+
+                    // Sector 3
+                    else if(alpha_1a < -30) {
+
+                      // Checking if hit is left or right of conter centre
+                      if(L_Theta + alpha_1a < 0)L_Perp_1a = - L_Perp_1a;
+
+                      // Positive particles
+                      if(p->par()->getCharge()>0){
+                        h_Denominator[0][1][2]->Fill(i,L_det_1a, L_Perp_1a);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF1A)->getEnergy())  h_Numerator[0][1][2]->Fill(i,L_det_1a, L_Perp_1a);
+                      }
+
+                      // Negative particles
+                      else if(p->par()->getCharge()<0){
+                        h_Denominator[0][0][2]->Fill(i,L_det_1a, L_Perp_1a);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF1A)->getEnergy())  h_Numerator[0][0][2]->Fill(i,L_det_1a, L_Perp_1a);
+                      }
+                    }
+                  }
                 }
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 //FTOF1B
 
-                // Requiring a hit in FTOF1A
-                // if(p->sci(FTOF1A)->getEnergy()>0){
-
+                // Requiring a DC trajectory in FTOF1B
                 if(p->traj(FTOF,FTOF1B)->getDetector()==12 && p->traj(FTOF,FTOF1B)->getLayer()==2){
+
+                  // Looking at momentum distribution for positive and negative particles
                   if(p->par()->getCharge()>0) hMomentum_1B_p->Fill(p->par()->getP());
                   else if(p->par()->getCharge()<0) hMomentum_1B_n->Fill(p->par()->getP());
 
@@ -723,16 +661,14 @@ void FTOF_2pi_Missing_Pim(){
                   y_1b =  p->traj(FTOF, FTOF1B)->getY();
                   z_1b = p->traj(FTOF, FTOF1B)->getZ();
 
-                  // Getting x-, y- and z- co-ordinates from FTOF hit
+                  // Requiring hit in FTOF1B
                   if(p->sci(FTOF1B)->getEnergy()){
+
+                    // Getting x-, y- and z- co-ordinates from FTOF hit
                     x_FTOF =  p->sci(FTOF1B)->getX();
                     y_FTOF =  p->sci(FTOF1B)->getY();
                     z_FTOF =  p->sci(FTOF1B)->getZ();
 
-                    // FTOF time
-                    h_FTOF_time_1B->Fill(p->sci(FTOF1B)->getTime() - start_time);
-
-                    // if(p->sci(FTOF1B)->getTime()-start_time < 20 || p->sci(FTOF1B)->getTime()-start_time > 40)continue;
 
                     // Distance between DC and FTOF co-ordinates
                     radia_residual = sqrt(pow(x_1b-x_FTOF,2) + pow(y_1b-y_FTOF,2) + pow(z_1b-z_FTOF,2));
@@ -752,7 +688,7 @@ void FTOF_2pi_Missing_Pim(){
 
                   // Getting L in detector plane by accounting for tilt of FTOF1B (25 deg)
                   L_det_1b = L_1b / cos(TMath::DegToRad()*25);
-                  // Calculating the distance along the width of the counter
+                  // Calculating the distance along the width of the counter from centre
                   L_Perp_1b = pow(pow(d_1b,2) - pow(L_1b,2), 0.5);
 
                   // Resetting the component to unphysical value
@@ -766,66 +702,48 @@ void FTOF_2pi_Missing_Pim(){
                     hlvscounter1B->Fill(Component,L_det_1b);
                   }
 
-                  // Checking backgroud as a function of L
-                  hmass_L_1b->Fill(L_det_1b, misspim.M2());
-
-
-                  // Determine which sector the hit is in using alpha
+                  // Determine which sector the hit is in using alpha and x_1b
                   // Look at positive x (sectors 1,2 and 6)
                   if(x_1b > 0){
+
                     // Sector 2
                     if(alpha_1b > 30){
                       // Checking to see which side of the middle the hit is
-                      L_Theta = 60;
                       if(L_Theta - alpha_1b < 0)L_Perp_1b = - L_Perp_1b;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
-                        h_Trajectories[1][1][1]->Fill(i,L_det_1b, L_Perp_1b);
+                        h_Denominator[1][1][1]->Fill(i,L_det_1b, L_Perp_1b);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF1B)->getEnergy()) h_Numerator[1][1][1]->Fill(i,L_det_1b, L_Perp_1b);
                       }
 
                       // Negative particles
                       else if(p->par()->getCharge()<0){
-                        h_Trajectories[1][0][1]->Fill(i,L_det_1b, L_Perp_1b);
-                      }
-                      // Check if there is energy deposited on the scintillator
-                      if(p->sci(FTOF1B)->getEnergy()){
-                        // Positive particles
-                        if(p->par()->getCharge()>0){
-                          h_Tracks[1][1][1]->Fill(i,L_det_1b, L_Perp_1b);
-                        }
-
-                        // Negative particles
-                        else if(p->par()->getCharge()<0){
-                          h_Tracks[1][0][1]->Fill(i,L_det_1b, L_Perp_1b);
-                        }
+                        h_Denominator[1][0][1]->Fill(i,L_det_1b, L_Perp_1b);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF1B)->getEnergy()) h_Numerator[1][1][1]->Fill(i,L_det_1b, L_Perp_1b);
                       }
                     }
 
                     // Sector 1
                     else if(fabs(alpha_1b) < 30) {
 
+                      // Checking if hit is left or right of counter centre
                       if(alpha_1b < 0)L_Perp_1b = - L_Perp_1b;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
-                        h_Trajectories[1][1][0]->Fill(i,L_det_1b, L_Perp_1b);
+                        h_Denominator[1][1][0]->Fill(i,L_det_1b, L_Perp_1b);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF1B)->getEnergy()) h_Numerator[1][1][0]->Fill(i,L_det_1b, L_Perp_1b);
                       }
 
                       // Negative particles
                       else if(p->par()->getCharge()<0){
-                        h_Trajectories[1][0][0]->Fill(i,L_det_1b, L_Perp_1b);
-                      }
-
-                      // Check if there is energy deposited on the scintillator
-                      if(p->sci(FTOF1B)->getEnergy()){
-                        if(p->par()->getCharge()>0){
-                          h_Tracks[1][1][0]->Fill(i,L_det_1b, L_Perp_1b);
-                        }
-
-                        else if(p->par()->getCharge()<0){
-                          h_Tracks[1][0][0]->Fill(i,L_det_1b, L_Perp_1b);
-                        }
+                        h_Denominator[1][0][0]->Fill(i,L_det_1b, L_Perp_1b);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF1B)->getEnergy()) h_Numerator[1][0][0]->Fill(i,L_det_1b, L_Perp_1b);
                       }
                     }
 
@@ -833,28 +751,21 @@ void FTOF_2pi_Missing_Pim(){
 
                     else if(alpha_1b < -30) {
 
-                      L_Theta = 60;
+                      // Checking if hit is left or right of counter centre
                       if(L_Theta + alpha_1b < 0)L_Perp_1b = - L_Perp_1b;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
-                        h_Trajectories[1][1][5]->Fill(i,L_det_1b, L_Perp_1b);
+                        h_Denominator[1][1][5]->Fill(i,L_det_1b, L_Perp_1b);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF1B)->getEnergy()) h_Numerator[1][1][5]->Fill(i,L_det_1b, L_Perp_1b);
                       }
 
                       // Negative particles
                       else if(p->par()->getCharge()<0){
-                        h_Trajectories[1][0][5]->Fill(i,L_det_1b, L_Perp_1b);
-                      }
-
-                      // Check if there is energy deposited on the scintillator
-                      if(p->sci(FTOF1B)->getEnergy()){
-                        if(p->par()->getCharge()>0){
-                          h_Tracks[1][1][5]->Fill(i,L_det_1b, L_Perp_1b);
-                        }
-
-                        else if(p->par()->getCharge()<0){
-                          h_Tracks[1][0][5]->Fill(i,L_det_1b, L_Perp_1b);
-                        }
+                        h_Denominator[1][0][5]->Fill(i,L_det_1b, L_Perp_1b);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF1B)->getEnergy()) h_Numerator[1][0][5]->Fill(i,L_det_1b, L_Perp_1b);
                       }
                     }
                   }
@@ -863,106 +774,86 @@ void FTOF_2pi_Missing_Pim(){
                   else if(x_1b < 0){
 
                     // Sector 5
-
                     if(alpha_1b > 30){
 
-                      L_Theta = 60;
+                      // Checking if hit is left or right of counter centre
                       if(L_Theta - alpha_1b < 0)L_Perp_1b = - L_Perp_1b;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
-                        h_Trajectories[1][1][4]->Fill(i,L_det_1b, L_Perp_1b);
+                        h_Denominator[1][1][4]->Fill(i,L_det_1b, L_Perp_1b);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF1B)->getEnergy()) h_Numerator[1][1][4]->Fill(i,L_det_1b, L_Perp_1b);
                       }
 
                       // Negative particles
                       else if(p->par()->getCharge()<0){
-                        h_Trajectories[1][0][4]->Fill(i,L_det_1b, L_Perp_1b);
-                      }
-
-                      // Check if there is energy deposited on the scintillator
-                      if(p->sci(FTOF1B)->getEnergy()){
-                        if(p->par()->getCharge()>0){
-                          h_Tracks[1][1][4]->Fill(i,L_det_1b, L_Perp_1b);
-                        }
-
-                        else if(p->par()->getCharge()<0){
-                          h_Tracks[1][0][4]->Fill(i,L_det_1b, L_Perp_1b);
-                        }
+                        h_Denominator[1][0][4]->Fill(i,L_det_1b, L_Perp_1b);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF1B)->getEnergy()) h_Numerator[1][0][4]->Fill(i,L_det_1b, L_Perp_1b);
                       }
                     }
 
                     // Sector 4
                     else if(fabs(alpha_1b) < 30) {
 
+                      // Checking if hit is left or right of counter centre
                       if(alpha_1b < 0)L_Perp_1b = - L_Perp_1b;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
-                        h_Trajectories[1][1][3]->Fill(i,L_det_1b, L_Perp_1b);
+                        h_Denominator[1][1][3]->Fill(i,L_det_1b, L_Perp_1b);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF1B)->getEnergy()) h_Numerator[1][1][3]->Fill(i,L_det_1b, L_Perp_1b);
                       }
 
                       // Negative particles
                       else if(p->par()->getCharge()<0){
-                        h_Trajectories[1][0][3]->Fill(i,L_det_1b, L_Perp_1b);
-                      }
-
-                      // Check if there is energy deposited on the scintillator
-                      if(p->sci(FTOF1B)->getEnergy()){
-                        if(p->par()->getCharge()>0){
-                          h_Tracks[1][1][3]->Fill(i,L_det_1b, L_Perp_1b);
-                        }
-
-                        else if(p->par()->getCharge()<0){
-                          h_Tracks[1][0][3]->Fill(i,L_det_1b, L_Perp_1b);
-                        }
+                        h_Denominator[1][0][3]->Fill(i,L_det_1b, L_Perp_1b);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF1B)->getEnergy()) h_Numerator[1][0][3]->Fill(i,L_det_1b, L_Perp_1b);
                       }
                     }
 
                     // Sector 3
                     else if(alpha_1b < -30) {
 
-                      L_Theta = 60;
+                      // Checking if hit is left or right of counter centre
                       if(L_Theta + alpha_1b < 0)L_Perp_1b = - L_Perp_1b;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
-                        h_Trajectories[1][1][2]->Fill(i,L_det_1b, L_Perp_1b);
+                        h_Denominator[1][1][2]->Fill(i,L_det_1b, L_Perp_1b);
+                        if(p->sci(FTOF1B)->getEnergy()) h_Numerator[1][1][2]->Fill(i,L_det_1b, L_Perp_1b);
                       }
 
                       // Negative particles
                       else if(p->par()->getCharge()<0){
-                        h_Trajectories[1][0][2]->Fill(i,L_det_1b, L_Perp_1b);
-                      }
-
-                      // Check if there is energy deposited on the scintillator
-                      if(p->sci(FTOF1B)->getEnergy()){
-                        if(p->par()->getCharge()>0){
-                          h_Tracks[1][1][2]->Fill(i,L_det_1b, L_Perp_1b);
-                        }
-
-                        else if(p->par()->getCharge()<0){
-                          h_Tracks[1][0][2]->Fill(i,L_det_1b, L_Perp_1b);
-                        }
+                        h_Denominator[1][0][2]->Fill(i,L_det_1b, L_Perp_1b);
+                        if(p->sci(FTOF1B)->getEnergy()) h_Numerator[1][0][2]->Fill(i,L_det_1b, L_Perp_1b);
                       }
                     }
                   }
                 }
-                // }
-                // }
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 //FTOF2
+
+                // Requiring a DC trajectory in FTOF1B
                 if(p->traj(FTOF,FTOF2)->getDetector()==12 && p->traj(FTOF,FTOF2)->getLayer()==3){
+
+                  // Looking at momentum distribution for positive and negative particles
                   if(p->par()->getCharge()>0) hMomentum_2_p->Fill(p->par()->getP());
                   else if(p->par()->getCharge()<0) hMomentum_2_n->Fill(p->par()->getP());
-
 
                   // Getting the x-, y- and z- co-ordinates from DC
                   x_2 =  p->traj(FTOF, FTOF2)->getX();
                   y_2 =  p->traj(FTOF, FTOF2)->getY();
                   z_2 = p->traj(FTOF, FTOF2)->getZ();
 
-                  // Getting x-, y- and z- co-ordinates from FTOF hit
+                  // Checking if there is energy deposition in FTOF2
                   if(p->sci(FTOF2)->getEnergy()){
+
+                    // Getting x-, y- and z- co-ordinates from FTOF hit
                     x_FTOF =  p->sci(FTOF2)->getX();
                     y_FTOF =  p->sci(FTOF2)->getY();
                     z_FTOF =  p->sci(FTOF2)->getZ();
@@ -988,7 +879,6 @@ void FTOF_2pi_Missing_Pim(){
                   // Calculating the distance along the width of the counter
                   L_Perp_2 = pow(pow(d_2,2) - pow(L_2,2), 0.5);
 
-
                   // Resetting the component to unphysical value
                   Component = -10;
 
@@ -1006,57 +896,41 @@ void FTOF_2pi_Missing_Pim(){
                   if(x_2 > 0){
                     // Sector 2
                     if(alpha_2 > 30){
+
                       // Checking to see which side of the middle the hit is
-                      L_Theta = 60;
                       if(L_Theta - alpha_2 < 0)L_Perp_2 = - L_Perp_2;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
-                        h_Trajectories[2][1][1]->Fill(i,L_det_2, L_Perp_2);
+                        h_Denominator[2][1][1]->Fill(i,L_det_2, L_Perp_2);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF2)->getEnergy()) h_Numerator[2][1][1]->Fill(i,L_det_2, L_Perp_2);
                       }
 
                       // Negative particles
                       else if(p->par()->getCharge()<0){
-                        h_Trajectories[2][0][1]->Fill(i,L_det_2, L_Perp_2);
-                      }
-                      // Check if there is energy deposited on the scintillator
-                      if(p->sci(FTOF2)->getEnergy()){
-                        // Positive particles
-                        if(p->par()->getCharge()>0){
-                          h_Tracks[2][1][1]->Fill(i,L_det_2, L_Perp_2);
-                        }
-
-                        // Negative particles
-                        else if(p->par()->getCharge()<0){
-                          h_Tracks[2][0][1]->Fill(i,L_det_2, L_Perp_2);
-                        }
+                        h_Denominator[2][0][1]->Fill(i,L_det_2, L_Perp_2);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF2)->getEnergy()) h_Numerator[2][0][1]->Fill(i,L_det_2, L_Perp_2);
                       }
                     }
 
                     // Sector 1
                     else if(fabs(alpha_2) < 30) {
 
-                      if(alpha_2 < 0)L_Perp_2 = - L_Perp_2;
+                      // Checking to see which side of the middle the hit is
+                      if(alpha_2 < 0) L_Perp_2 = - L_Perp_2;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
-                        h_Trajectories[2][1][0]->Fill(i,L_det_2, L_Perp_2);
+                        h_Denominator[2][1][0]->Fill(i,L_det_2, L_Perp_2);
+                        if(p->sci(FTOF2)->getEnergy()) h_Numerator[2][1][0]->Fill(i,L_det_2, L_Perp_2);
                       }
 
                       // Negative particles
                       else if(p->par()->getCharge()<0){
-                        h_Trajectories[2][0][0]->Fill(i,L_det_2, L_Perp_2);
-                      }
-
-                      // Check if there is energy deposited on the scintillator
-                      if(p->sci(FTOF2)->getEnergy()){
-                        if(p->par()->getCharge()>0){
-                          h_Tracks[2][1][0]->Fill(i,L_det_2, L_Perp_2);
-                        }
-
-                        else if(p->par()->getCharge()<0){
-                          h_Tracks[2][0][0]->Fill(i,L_det_2, L_Perp_2);
-                        }
+                        h_Denominator[2][0][0]->Fill(i,L_det_2, L_Perp_2);
+                        if(p->sci(FTOF2)->getEnergy()) h_Numerator[2][0][0]->Fill(i,L_det_2, L_Perp_2);
                       }
                     }
 
@@ -1064,28 +938,21 @@ void FTOF_2pi_Missing_Pim(){
 
                     else if(alpha_2 < -30) {
 
-                      L_Theta = 60;
+                      // Checking to see which side of the middle the hit is
                       if(L_Theta + alpha_2 < 0)L_Perp_2 = - L_Perp_2;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
-                        h_Trajectories[2][1][5]->Fill(i,L_det_2, L_Perp_2);
+                        h_Denominator[2][1][5]->Fill(i,L_det_2, L_Perp_2);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF2)->getEnergy()) h_Numerator[2][1][5]->Fill(i,L_det_2, L_Perp_2);
                       }
 
                       // Negative particles
                       else if(p->par()->getCharge()<0){
-                        h_Trajectories[2][0][5]->Fill(i,L_det_2, L_Perp_2);
-                      }
-
-                      // Check if there is energy deposited on the scintillator
-                      if(p->sci(FTOF2)->getEnergy()){
-                        if(p->par()->getCharge()>0){
-                          h_Tracks[2][1][5]->Fill(i,L_det_2, L_Perp_2);
-                        }
-
-                        else if(p->par()->getCharge()<0){
-                          h_Tracks[2][0][5]->Fill(i,L_det_2, L_Perp_2);
-                        }
+                        h_Denominator[2][0][5]->Fill(i,L_det_2, L_Perp_2);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF2)->getEnergy()) h_Numerator[2][0][5]->Fill(i,L_det_2, L_Perp_2);
                       }
                     }
                   }
@@ -1094,86 +961,65 @@ void FTOF_2pi_Missing_Pim(){
                   else if(x_2 < 0){
 
                     // Sector 5
-
                     if(alpha_2 > 30){
 
-                      L_Theta = 60;
+                      // Checking to see which side of the middle the hit is
                       if(L_Theta - alpha_2 < 0)L_Perp_2 = - L_Perp_2;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
-                        h_Trajectories[2][1][4]->Fill(i,L_det_2, L_Perp_2);
+                        h_Denominator[2][1][4]->Fill(i,L_det_2, L_Perp_2);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF2)->getEnergy()) h_Numerator[2][1][4]->Fill(i,L_det_2, L_Perp_2);
                       }
 
                       // Negative particles
                       else if(p->par()->getCharge()<0){
-                        h_Trajectories[2][0][4]->Fill(i,L_det_2, L_Perp_2);
-                      }
-
-                      // Check if there is energy deposited on the scintillator
-                      if(p->sci(FTOF2)->getEnergy()){
-                        if(p->par()->getCharge()>0){
-                          h_Tracks[2][1][4]->Fill(i,L_det_2, L_Perp_2);
-                        }
-
-                        else if(p->par()->getCharge()<0){
-                          h_Tracks[2][0][4]->Fill(i,L_det_2, L_Perp_2);
-                        }
+                        h_Denominator[2][0][4]->Fill(i,L_det_2, L_Perp_2);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF2)->getEnergy()) h_Numerator[2][0][4]->Fill(i,L_det_2, L_Perp_2);
                       }
                     }
 
                     // Sector 4
                     else if(fabs(alpha_2) < 30) {
 
+                      // Checking to see which side of the middle the hit is
                       if(alpha_2 < 0)L_Perp_2 = - L_Perp_2;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
-                        h_Trajectories[2][1][3]->Fill(i,L_det_2, L_Perp_2);
+                        h_Denominator[2][1][3]->Fill(i,L_det_2, L_Perp_2);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF2)->getEnergy()) h_Numerator[2][1][3]->Fill(i,L_det_2, L_Perp_2);
                       }
 
                       // Negative particles
                       else if(p->par()->getCharge()<0){
-                        h_Trajectories[2][0][3]->Fill(i,L_det_2, L_Perp_2);
-                      }
-
-                      // Check if there is energy deposited on the scintillator
-                      if(p->sci(FTOF2)->getEnergy()){
-                        if(p->par()->getCharge()>0){
-                          h_Tracks[2][1][3]->Fill(i,L_det_2, L_Perp_2);
-                        }
-
-                        else if(p->par()->getCharge()<0){
-                          h_Tracks[2][0][3]->Fill(i,L_det_2, L_Perp_2);
-                        }
+                        h_Denominator[2][0][3]->Fill(i,L_det_2, L_Perp_2);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF2)->getEnergy()) h_Numerator[2][0][3]->Fill(i,L_det_2, L_Perp_2);
                       }
                     }
 
                     // Sector 3
                     else if(alpha_2 < -30) {
 
-                      L_Theta = 60;
+                      // Checking to see which side of the middle the hit is
                       if(L_Theta + alpha_2 < 0)L_Perp_2 = - L_Perp_2;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
-                        h_Trajectories[2][1][2]->Fill(i,L_det_2, L_Perp_2);
+                        h_Denominator[2][1][2]->Fill(i,L_det_2, L_Perp_2);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF2)->getEnergy()) h_Numerator[2][1][2]->Fill(i,L_det_2, L_Perp_2);
                       }
 
                       // Negative particles
                       else if(p->par()->getCharge()<0){
-                        h_Trajectories[2][0][2]->Fill(i,L_det_2, L_Perp_2);
-                      }
-
-                      // Check if there is energy deposited on the scintillator
-                      if(p->sci(FTOF2)->getEnergy()){
-                        if(p->par()->getCharge()>0){
-                          h_Tracks[2][1][2]->Fill(i,L_det_2, L_Perp_2);
-                        }
-
-                        else if(p->par()->getCharge()<0){
-                          h_Tracks[2][0][2]->Fill(i,L_det_2, L_Perp_2);
-                        }
+                        h_Denominator[2][0][2]->Fill(i,L_det_2, L_Perp_2);
+                        // Check if there is energy deposited on the scintillator
+                        if(p->sci(FTOF2)->getEnergy()) h_Numerator[2][0][2]->Fill(i,L_det_2, L_Perp_2);
                       }
                     }
                   }
@@ -1182,14 +1028,10 @@ void FTOF_2pi_Missing_Pim(){
             }
           }
         }
-        // }
       }
     }
-
     v_Runno.push_back(to_string(runno)); // Converting runno integer to a string
   }
-
   //saving the file
   fileOutput1.Write();
-
 }
