@@ -62,9 +62,9 @@ void FTOF_2pi_Missing_Pim(){
   auto files=fake.GetListOfFiles();
   // Gets total events in all files for run dependence binning
   Int_t Bins = files->GetEntries();
-  // Output file location and name
 
-  TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGA_FALL2018_skim4_Outbending_2pi_misspim_withoutcuts_highbinning_20102021_01.root","recreate");
+  // Output file location and name
+  TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGA_FALL2018_skim4_Outbending_2pi_misspim_withoutcuts_20102021_01.root","recreate");
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Creating vectors and variables
@@ -200,12 +200,12 @@ void FTOF_2pi_Missing_Pim(){
           // Average distance between counter centres is 15.18 cm
           // FTOF 1A first counter starts at L = 77.16 cm
           // FTOF 1A last counter ends at L = 426.3 cm
-          // h_Denominator[i_detector][i_charge][i_sector] = new TH3F(Denominator_name_stream.str().c_str(),"", Bins,0,Bins, 25, 61.98, 441.48, 50, -250, 250);
-          // h_Numerator[i_detector][i_charge][i_sector] = new TH3F(Numerator_name_stream.str().c_str(),"", Bins,0,Bins, 25, 61.98, 441.48, 50, -250 , 250);
+          h_Denominator[i_detector][i_charge][i_sector] = new TH3F(Denominator_name_stream.str().c_str(),"", Bins,0,Bins, 25, 61.98, 441.48, 50, -250, 250);
+          h_Numerator[i_detector][i_charge][i_sector] = new TH3F(Numerator_name_stream.str().c_str(),"", Bins,0,Bins, 25, 61.98, 441.48, 50, -250 , 250);
 
           // High binning to check FTOF geometry
-          h_Denominator[i_detector][i_charge][i_sector] = new TH3F(Denominator_name_stream.str().c_str(),"", Bins,0,Bins, 1000, 61.98, 441.48, 50, -250, 250);
-          h_Numerator[i_detector][i_charge][i_sector] = new TH3F(Numerator_name_stream.str().c_str(),"", Bins,0,Bins, 1000, 61.98, 441.48, 50, -250 , 250);
+          // h_Denominator[i_detector][i_charge][i_sector] = new TH3F(Denominator_name_stream.str().c_str(),"", Bins,0,Bins, 1000, 61.98, 441.48, 50, -250, 250);
+          // h_Numerator[i_detector][i_charge][i_sector] = new TH3F(Numerator_name_stream.str().c_str(),"", Bins,0,Bins, 1000, 61.98, 441.48, 50, -250 , 250);
 
         }
 
@@ -218,12 +218,12 @@ void FTOF_2pi_Missing_Pim(){
           // Average distance between counter centres is 6.12 cm
           // First counter starts at L = 52.16 cm
           // Last counter ends at L = 431.6 cm
-          // h_Denominator[i_detector][i_charge][i_sector] = new TH3F(Denominator_name_stream.str().c_str(),"", Bins,0,Bins, 65, 46.04, 443.84, 50, -250, 250);
-          // h_Numerator[i_detector][i_charge][i_sector] = new TH3F(Numerator_name_stream.str().c_str(),"", Bins,0,Bins, 65, 46.04, 443.84, 50, -250 , 250);
+          h_Denominator[i_detector][i_charge][i_sector] = new TH3F(Denominator_name_stream.str().c_str(),"", Bins,0,Bins, 65, 46.04, 443.84, 50, -250, 250);
+          h_Numerator[i_detector][i_charge][i_sector] = new TH3F(Numerator_name_stream.str().c_str(),"", Bins,0,Bins, 65, 46.04, 443.84, 50, -250 , 250);
 
           // High binning to check FTOF geometry
-          h_Denominator[i_detector][i_charge][i_sector] = new TH3F(Denominator_name_stream.str().c_str(),"", Bins,0,Bins, 1000, 46.04, 443.84, 50, -250, 250);
-          h_Numerator[i_detector][i_charge][i_sector] = new TH3F(Numerator_name_stream.str().c_str(),"", Bins,0,Bins, 1000, 46.04, 443.84, 50, -250 , 250);
+          // h_Denominator[i_detector][i_charge][i_sector] = new TH3F(Denominator_name_stream.str().c_str(),"", Bins,0,Bins, 1000, 46.04, 443.84, 50, -250, 250);
+          // h_Numerator[i_detector][i_charge][i_sector] = new TH3F(Numerator_name_stream.str().c_str(),"", Bins,0,Bins, 1000, 46.04, 443.84, 50, -250 , 250);
         }
 
         // FTOF2
