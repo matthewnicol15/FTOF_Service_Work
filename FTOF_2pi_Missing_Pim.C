@@ -49,8 +49,8 @@ void FTOF_2pi_Missing_Pim(){
   // Defining input and output files
 
   // Data files to process
-  // TString inputFile1("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/*.hipo");
-  TString inputFile1("/volatile/clas12/rg-a/production/recon/fall2018/torus+1/pass1/v2/calib/train/skim4/*.hipo");
+  TString inputFile1("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_005038.hipo");
+  // TString inputFile1("/volatile/clas12/rg-a/production/recon/fall2018/torus+1/pass1/v2/calib/train/skim4/*.hipo");
 
 
   // Creating a TChain of all the input files
@@ -64,7 +64,7 @@ void FTOF_2pi_Missing_Pim(){
   Int_t Bins = files->GetEntries();
 
   // Output file location and name
-  TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGA_FALL2018_skim4_Outbending_2pi_misspim_withoutcuts_20102021_01.root","recreate");
+  TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGA_FALL2018_Inbending_skim4_5038_2pi_misspim_Test_DC_OFF_Beta_OFF_Cal_OFF_FTOF_OFF_25102021_01.root","recreate");
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Creating vectors and variables
@@ -144,6 +144,41 @@ void FTOF_2pi_Missing_Pim(){
   auto* hlvscounter1B=new TH2F("hlvscounter1B","L vs counter FTOF1B;Counter;L [cm]",63,0,63,500,0,500);
   auto* hlvscounter2=new TH2F("hlvscounter2","L vs counter FTOF2;Counter;L [cm]",6,0,6,300,600,900);
 
+  // Testing Cuts
+  // DC fiducial cut
+  // Before
+  auto* h_DC_c1_xy_before = new TH2F("h_DC_c1_xy_before","DC layer 1 co-ordinates before fiducial cut",200,-200,200,200,-200,200);
+  auto* h_DC_c2_xy_before = new TH2F("h_DC_c2_xy_before","DC layer 2 co-ordinates before fiducial cut",300,-300,300, 300,-300,300);
+  auto* h_DC_c3_xy_before = new TH2F("h_DC_c3_xy_before","DC layer 3 co-ordinates before fiducial cut",500,-500,500,500,-500,500);
+  // After
+  auto* h_DC_c1_xy_after = new TH2F("h_DC_c1_xy_after","DC layer 1 co-ordinates before fiducial cut",200,-200,200,200,-200,200);
+  auto* h_DC_c2_xy_after = new TH2F("h_DC_c2_xy_after","DC layer 2 co-ordinates before fiducial cut",300,-300,300,300,-300,300);
+  auto* h_DC_c3_xy_after = new TH2F("h_DC_c3_xy_after","DC layer 3 co-ordinates before fiducial cut",500,-500,500,500,-500,500);
+
+  // Beta Cut
+  // Before
+  auto* h_beta=new TH2F("h_beta","beta;P [GeV];beta",1100,0,11,400,-2,2);
+  // After
+  auto* h_beta_cut_test=new TH2F("h_beta_cut_test","beta;P [GeV];beta",1100,0,11,400,-2,2);
+
+  // Calorimeter Cut
+  // Before
+  auto* h_PCAL_Energy = new TH1F("h_PCAL_Energy","PCAL energy before calorimeter cut",200,-0.5,1.5);
+  auto* h_ECIN_Energy = new TH1F("h_ECIN_Energy","ECIN energy before calorimeter cut",200,-0.5,1.5);
+  //After
+  auto* h_PCAL_Energy_cut_test = new TH1F("h_PCAL_Energy_cut_test","PCAL energy after calorimeter cut",200,-0.5,1.5);
+  auto* h_ECIN_Energy_cut_test = new TH1F("h_ECIN_Energy_cut_test","ECIN energy after calorimeter cut",200,-0.5,1.5);
+
+  // FTOF fiducial cut
+  // Before
+  auto* h_FTOF1A_LvsLperp_before = new TH2F("h_FTOF1A_LvsLperp_before","FTOF1A xy before FTOF fiducial cut", 500,-250,250,500,0,500);
+  auto* h_FTOF1B_LvsLperp_before = new TH2F("h_FTOF1B_LvsLperp_before","FTOF1B xy before FTOF fiducial cut", 500,-250,250,500,0,500);
+  auto* h_FTOF2_LvsLperp_before = new TH2F("h_FTOF2_LvsLperp_before","FTOF2 xy before FTOF fiducial cut", 500,-250,250,500,0,500);
+  // After
+  auto* h_FTOF1A_LvsLperp_after = new TH2F("h_FTOF1A_LvsLperp_after","FTOF1A xy after FTOF fiducial cut", 500,-250,250,500,0,500);
+  auto* h_FTOF1B_LvsLperp_after = new TH2F("h_FTOF1B_LvsLperp_after","FTOF1B xy after FTOF fiducial cut", 500,-250,250,500,0,500);
+  auto* h_FTOF2_LvsLperp_after = new TH2F("h_FTOF2_LvsLperp_after","FTOF2 xy after FTOF fiducial cut", 500,-250,250,500,0,500);
+
   // Particle information
   auto* hMomentum_1A_p=new TH1F("hMomentum_1A_p", "Momentum of positive tracks in FTOF1A; Momentum [GeV/c]; Counts;", 200,0,8);
   auto* hMomentum_1B_p=new TH1F("hMomentum_1B_p", "Momentum of positive tracks in FTOF1A; Momentum [GeV/c]; Counts;", 200,0,8);
@@ -153,7 +188,6 @@ void FTOF_2pi_Missing_Pim(){
   auto* hMomentum_2_n=new TH1F("hMomentum_2_n", "Momentum of negative tracks in FTOF1A; Momentum [GeV/c]; Counts;", 200,0,8);
   auto *h_z_vertex=new TH1D("h_z_vertex","z vertex",100,-15,15);
   auto *h_Pid=new TH1D("h_Pid","PID after cuts",10000,-5000,5000);
-  auto* h_beta=new TH2D("h_beta","beta;P [GeV];beta",1100,0,11,400,-2,2);
 
   // Event information
   auto* h_start_time=new TH1F("h_start_time","Start time;Start time [ns];Counts",400,0,200);
@@ -393,6 +427,11 @@ void FTOF_2pi_Missing_Pim(){
                     part_DC_c3z = p->traj(DC,36)->getZ();
                   }
 
+                  // DC co-ordinates before DC cuts
+                  h_DC_c1_xy_before->Fill(part_DC_c1x, part_DC_c1y);
+                  h_DC_c2_xy_before->Fill(part_DC_c2x, part_DC_c2y);
+                  h_DC_c3_xy_before->Fill(part_DC_c3x, part_DC_c3y);
+
                   // Reset PID value to zero each loop
                   part_pid = 0;
 
@@ -419,14 +458,27 @@ void FTOF_2pi_Missing_Pim(){
                     !DC_fiducial_cut_XY(part_DC_c1x,part_DC_c1y,part_DC_c1z,part_DC_c2x, part_DC_c2y, part_DC_c2z,part_DC_c3x, part_DC_c3y, part_DC_c3z, part_pid,part_DC_sector,2) ||
                     !DC_fiducial_cut_XY(part_DC_c1x,part_DC_c1y,part_DC_c1z,part_DC_c2x, part_DC_c2y, part_DC_c2z,part_DC_c3x, part_DC_c3y, part_DC_c3z, part_pid,part_DC_sector,3)) continue;
                   }
+
+                  // Testing DC fiducial cut
+                  // DC co-ordinates after DC cuts
+                  h_DC_c1_xy_after->Fill(part_DC_c1x, part_DC_c1y);
+                  h_DC_c2_xy_after->Fill(part_DC_c2x, part_DC_c2y);
+                  h_DC_c3_xy_after->Fill(part_DC_c3x, part_DC_c3y);
                 }
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+                h_PCAL_Energy->Fill(PCAL_Energy);
+                h_ECIN_Energy->Fill(ECIN_Energy);
                 // Check if calorimeter cuts are switched on
                 if(Calorimeter_Cut == 1){
                   // Only accept particles that deposit energy in PCAL and ECIN
                   if(PCAL_Energy == 0 || ECIN_Energy == 0) continue;
                 }
+
+                // Testing Calrimeter cut
+                h_PCAL_Energy_cut_test->Fill(PCAL_Energy);
+                h_ECIN_Energy_cut_test->Fill(ECIN_Energy);
 
                 // Defining momentum and beta of particles
                 Momentum = p->par()->getP();
@@ -439,6 +491,9 @@ void FTOF_2pi_Missing_Pim(){
                   // Removing particles with unphysical beta
                   if(beta < 0.4 || beta >1.1)continue;
                 }
+
+                // Testing Beta cut
+                h_beta_cut_test->Fill(Momentum,p->par()->getBeta());
 
                 // Getting the start time
                 start_time = c12.event()->getStartTime();
@@ -490,13 +545,28 @@ void FTOF_2pi_Missing_Pim(){
                   L_det_1a = L_1a / cos(TMath::DegToRad()*25);
                   // Calculating the distance along the width of the counter
                   L_Perp_1a = pow(pow(d_1a,2) - pow(L_1a,2), 0.5);
+                  // Checking if hit is left or right of counter centre
+                  if(alpha_1a > 30){
+                    if(L_Theta - alpha_1a < 0) L_Perp_1a = - L_Perp_1a;
+                  }
+                  else if(fabs(alpha_1a) < 30) {
+                    if(alpha_1a < 0)L_Perp_1a = - L_Perp_1a;
+                  }
+                  else if(alpha_1a < -30) {
+                    if(L_Theta + alpha_1a < 0) L_Perp_1a = - L_Perp_1a;
+                  }
+
+
+                  // FTOF co-ordinates before FTOF fiducial cut
+                  h_FTOF1A_LvsLperp_before->Fill(L_Perp_1a, L_det_1a);
+
 
                   // Checking if FTOF fiducial cuts are on
                   if(FTOF_Fiducial_Cuts != 0){
 
                     // Loose FTOF1A fiducial cuts
                     if(FTOF_Fiducial_Cuts == 1){
-                      if(L_det_1a < 77 || L_det_1a > 420.6 || (L_det_1a - (2.1 * fabs(L_Perp_1a))) < 43.09) continue
+                      if(L_det_1a < 77 || L_det_1a > 420.6 || (L_det_1a - (2.1 * fabs(L_Perp_1a))) < 43.09) continue;
                     }
 
                     // Tight FTOF1A fiducial cuts
@@ -504,6 +574,9 @@ void FTOF_2pi_Missing_Pim(){
                       if(L_det_1a < 80 || L_det_1a > 410 || (L_det_1a - (2.2 * fabs(L_Perp_1a))) < 58) continue;
                     }
                   }
+
+                  // Testing FTOF fiducial cut
+                  h_FTOF1A_LvsLperp_after->Fill(L_Perp_1a, L_det_1a);
 
                   // Resetting the component to unphysical value
                   Component = -10;
@@ -522,8 +595,6 @@ void FTOF_2pi_Missing_Pim(){
 
                     // Sector 2
                     if(alpha_1a > 30){
-                      // Checking to see which side of the middle the hit is
-                      if(L_Theta - alpha_1a < 0) L_Perp_1a = - L_Perp_1a;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
@@ -543,8 +614,6 @@ void FTOF_2pi_Missing_Pim(){
                     // Sector 1
                     else if(fabs(alpha_1a) < 30) {
 
-                      if(alpha_1a < 0)L_Perp_1a = - L_Perp_1a;
-
                       // Positive particles
                       if(p->par()->getCharge()>0){
                         h_Denominator[0][1][0]->Fill(i,L_det_1a, L_Perp_1a);
@@ -561,9 +630,6 @@ void FTOF_2pi_Missing_Pim(){
 
                     // Sector 6
                     else if(alpha_1a < -30) {
-
-                      // Checking if hit is left or right of counter centre
-                      if(L_Theta + alpha_1a < 0) L_Perp_1a = - L_Perp_1a;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
@@ -586,9 +652,6 @@ void FTOF_2pi_Missing_Pim(){
                     // Sector 5
                     if(alpha_1a > 30){
 
-                      // Checking if hit is left or right of conter centre
-                      if(L_Theta - alpha_1a < 0)L_Perp_1a = - L_Perp_1a;
-
                       // Positive particles
                       if(p->par()->getCharge()>0){
                         h_Denominator[0][1][4]->Fill(i,L_det_1a, L_Perp_1a);
@@ -605,9 +668,6 @@ void FTOF_2pi_Missing_Pim(){
 
                     // Sector 4
                     else if(fabs(alpha_1a) < 30) {
-
-                      // Checking if hit is left or right of conter centre
-                      if(alpha_1a < 0)L_Perp_1a = - L_Perp_1a;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
@@ -626,9 +686,6 @@ void FTOF_2pi_Missing_Pim(){
 
                     // Sector 3
                     else if(alpha_1a < -30) {
-
-                      // Checking if hit is left or right of conter centre
-                      if(L_Theta + alpha_1a < 0)L_Perp_1a = - L_Perp_1a;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
@@ -690,6 +747,16 @@ void FTOF_2pi_Missing_Pim(){
                   L_det_1b = L_1b / cos(TMath::DegToRad()*25);
                   // Calculating the distance along the width of the counter from centre
                   L_Perp_1b = pow(pow(d_1b,2) - pow(L_1b,2), 0.5);
+                  // Checking if hit is left or right of counter centre
+                  if(alpha_1b > 30){
+                    if(L_Theta - alpha_1b < 0) L_Perp_1b = - L_Perp_1b;
+                  }
+                  else if(fabs(alpha_1b) < 30) {
+                    if(alpha_1b < 0)L_Perp_1b = - L_Perp_1b;
+                  }
+                  else if(alpha_1b < -30) {
+                    if(L_Theta + alpha_1b < 0) L_Perp_1b = - L_Perp_1b;
+                  }
 
                   // Resetting the component to unphysical value
                   Component = -10;
@@ -708,8 +775,6 @@ void FTOF_2pi_Missing_Pim(){
 
                     // Sector 2
                     if(alpha_1b > 30){
-                      // Checking to see which side of the middle the hit is
-                      if(L_Theta - alpha_1b < 0)L_Perp_1b = - L_Perp_1b;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
@@ -729,9 +794,6 @@ void FTOF_2pi_Missing_Pim(){
                     // Sector 1
                     else if(fabs(alpha_1b) < 30) {
 
-                      // Checking if hit is left or right of counter centre
-                      if(alpha_1b < 0)L_Perp_1b = - L_Perp_1b;
-
                       // Positive particles
                       if(p->par()->getCharge()>0){
                         h_Denominator[1][1][0]->Fill(i,L_det_1b, L_Perp_1b);
@@ -750,9 +812,6 @@ void FTOF_2pi_Missing_Pim(){
                     // Sector 6
 
                     else if(alpha_1b < -30) {
-
-                      // Checking if hit is left or right of counter centre
-                      if(L_Theta + alpha_1b < 0)L_Perp_1b = - L_Perp_1b;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
@@ -776,9 +835,6 @@ void FTOF_2pi_Missing_Pim(){
                     // Sector 5
                     if(alpha_1b > 30){
 
-                      // Checking if hit is left or right of counter centre
-                      if(L_Theta - alpha_1b < 0)L_Perp_1b = - L_Perp_1b;
-
                       // Positive particles
                       if(p->par()->getCharge()>0){
                         h_Denominator[1][1][4]->Fill(i,L_det_1b, L_Perp_1b);
@@ -797,9 +853,6 @@ void FTOF_2pi_Missing_Pim(){
                     // Sector 4
                     else if(fabs(alpha_1b) < 30) {
 
-                      // Checking if hit is left or right of counter centre
-                      if(alpha_1b < 0)L_Perp_1b = - L_Perp_1b;
-
                       // Positive particles
                       if(p->par()->getCharge()>0){
                         h_Denominator[1][1][3]->Fill(i,L_det_1b, L_Perp_1b);
@@ -817,9 +870,6 @@ void FTOF_2pi_Missing_Pim(){
 
                     // Sector 3
                     else if(alpha_1b < -30) {
-
-                      // Checking if hit is left or right of counter centre
-                      if(L_Theta + alpha_1b < 0)L_Perp_1b = - L_Perp_1b;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
@@ -878,6 +928,16 @@ void FTOF_2pi_Missing_Pim(){
                   L_det_2 = L_2 / cos(TMath::DegToRad()*58.11);
                   // Calculating the distance along the width of the counter
                   L_Perp_2 = pow(pow(d_2,2) - pow(L_2,2), 0.5);
+                  // Checking if hit is left or right of counter centre
+                  if(alpha_2 > 30){
+                    if(L_Theta - alpha_2 < 0) L_Perp_2 = - L_Perp_2;
+                  }
+                  else if(fabs(alpha_2) < 30) {
+                    if(alpha_2 < 0)L_Perp_2 = - L_Perp_2;
+                  }
+                  else if(alpha_2 < -30) {
+                    if(L_Theta + alpha_2 < 0) L_Perp_2 = - L_Perp_2;
+                  }
 
                   // Resetting the component to unphysical value
                   Component = -10;
@@ -897,9 +957,6 @@ void FTOF_2pi_Missing_Pim(){
                     // Sector 2
                     if(alpha_2 > 30){
 
-                      // Checking to see which side of the middle the hit is
-                      if(L_Theta - alpha_2 < 0)L_Perp_2 = - L_Perp_2;
-
                       // Positive particles
                       if(p->par()->getCharge()>0){
                         h_Denominator[2][1][1]->Fill(i,L_det_2, L_Perp_2);
@@ -918,9 +975,6 @@ void FTOF_2pi_Missing_Pim(){
                     // Sector 1
                     else if(fabs(alpha_2) < 30) {
 
-                      // Checking to see which side of the middle the hit is
-                      if(alpha_2 < 0) L_Perp_2 = - L_Perp_2;
-
                       // Positive particles
                       if(p->par()->getCharge()>0){
                         h_Denominator[2][1][0]->Fill(i,L_det_2, L_Perp_2);
@@ -937,9 +991,6 @@ void FTOF_2pi_Missing_Pim(){
                     // Sector 6
 
                     else if(alpha_2 < -30) {
-
-                      // Checking to see which side of the middle the hit is
-                      if(L_Theta + alpha_2 < 0)L_Perp_2 = - L_Perp_2;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
@@ -963,9 +1014,6 @@ void FTOF_2pi_Missing_Pim(){
                     // Sector 5
                     if(alpha_2 > 30){
 
-                      // Checking to see which side of the middle the hit is
-                      if(L_Theta - alpha_2 < 0)L_Perp_2 = - L_Perp_2;
-
                       // Positive particles
                       if(p->par()->getCharge()>0){
                         h_Denominator[2][1][4]->Fill(i,L_det_2, L_Perp_2);
@@ -984,9 +1032,6 @@ void FTOF_2pi_Missing_Pim(){
                     // Sector 4
                     else if(fabs(alpha_2) < 30) {
 
-                      // Checking to see which side of the middle the hit is
-                      if(alpha_2 < 0)L_Perp_2 = - L_Perp_2;
-
                       // Positive particles
                       if(p->par()->getCharge()>0){
                         h_Denominator[2][1][3]->Fill(i,L_det_2, L_Perp_2);
@@ -1004,9 +1049,6 @@ void FTOF_2pi_Missing_Pim(){
 
                     // Sector 3
                     else if(alpha_2 < -30) {
-
-                      // Checking to see which side of the middle the hit is
-                      if(L_Theta + alpha_2 < 0)L_Perp_2 = - L_Perp_2;
 
                       // Positive particles
                       if(p->par()->getCharge()>0){
