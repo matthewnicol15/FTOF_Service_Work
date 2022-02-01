@@ -2,7 +2,7 @@
 Double_t Polarity = 1; // inbending = 0, outbending = 1, used to set fiducial cut automatically
 
 // Set the Run period
-Int_t Run_Period = 3; // RGB Spring 2019 = 3
+Int_t Run_Period = 1; // RGA Fall 2018 = 1, RGB Spring 2019 = 3
 
 // Does this skip this loop or the whole event? as it might remove events from
 // missing pip or missing proton
@@ -675,56 +675,50 @@ void Second_Loop(int runno, int i_topology, int i_charge, int i_detector, int i_
 
 // Loading macro
 void FTOF_Unified(){
-// void FTOF_Unified(TString inFileName){
+  // void FTOF_Unified(TString inFileName){
 
 
-TChain fake("hipo");
-// fChain = new TChain("h10");
+  TChain fake("hipo");
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   //-----------------File Chaining----------------------
-  // string ifname="/home/matthewn/File_Lists/RGB_Spring_2019_file_path_list.txt";  //list of data files
-  // // string ifname=fList;  //list of data files
-  // int Nfiles = 0;
-  // vector < string > ifname_hipo;
-  // ifstream ifile(ifname.c_str());
-  //
-  // while(1){
-  //   if(ifile.eof()) break;
-  //   string name;
-  //   ifile>>name;
-  //   ifname_hipo.push_back(name);
-  //   Nfiles++;
-  // }
-  //
-  // ifile.close();
-  // cout << "There are " << Nfiles << " files to analyse" << endl;
-  //
-  // for(int ii=0;ii<Nfiles-1;ii++){
-  //   cout << "Adding " << ifname_hipo[ii].c_str() << endl;
-  //   // fChain->Add((ifname_hipo[ii]).c_str());
-  //   fake.Add((ifname_hipo[ii]).c_str());
-  //
-  // }
+  string ifname="/home/matthewn/File_Lists/RGA_Fall_2018_Inbending_51_file_list.txt";  //list of data files
+  // string ifname=fList;  //list of data files
+  int Nfiles = 0;
+  vector < string > ifname_hipo;
+  ifstream ifile(ifname.c_str());
+
+  while(1){
+    if(ifile.eof()) break;
+    string name;
+    ifile>>name;
+    ifname_hipo.push_back(name);
+    Nfiles++;
+  }
+
+  ifile.close();
+  cout << "There are " << Nfiles << " files to analyse" << endl;
+
+  for(int ii=0;ii<Nfiles-1;ii++){
+    cout << "Adding " << ifname_hipo[ii].c_str() << endl;
+    // fChain->Add((ifname_hipo[ii]).c_str());
+    fake.Add((ifname_hipo[ii]).c_str());
+
+  }
 
 
 
 
   // Defining input and output files
   // Data files to process
-  // TString inputFile("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/*.hipo");
-  // TString inputFile("/volatile/clas12/rg-a/production/recon/fall2018/torus+1/pass1/v2/calib/train/skim4/*.hipo");
-  // TString inputFile("/home/matthewn/links/RGB_Spring_2019_Inbending_dst/rec_clas_006420.evio*.hipo");
-  TString inputFile("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/recon/005038/*.hipo");
-  // TString inputFile = inFileName;
-
+  // TString inputFile("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/recon/005038/*.hipo");
 
 
 
   // Creating a TChain of all the input files
   // TChain fake("hipo");
   // Adding the different input files to the TChain
-  fake.Add(inputFile.Data());
+  // fake.Add(inputFile.Data());
   // fake.Add(inputFile1.Data());
 
   // Retrieving list of files
@@ -733,7 +727,7 @@ TChain fake("hipo");
   Int_t Bins = files->GetEntries();
 
   // Output file location and name
-  TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGA_Fall_2018_5038_dst_unified_01022022_01.root","recreate");
+  TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGA_Fall_2018_51_dst_unified_01022022_03.root","recreate");
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Defining the arrays of histograms
@@ -922,6 +916,9 @@ TChain fake("hipo");
 
       // Checking run period for beam energy
       // Setting the beam energy
+      if(Run_Period == 1){
+        beam.SetXYZM(0,0,10.6,0);
+      }
       if(Run_Period == 3){
         if(runno > 6419) beam.SetXYZM(0,0,10.2,0);
       }
