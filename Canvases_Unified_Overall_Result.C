@@ -19,7 +19,7 @@
   // Setting the strings for canvas name
   Data<<"RGB_Spring2019_63_dst";
   Date<<"01022022";
-  Version<<"02";
+  Version<<"03";
 
 
 
@@ -329,11 +329,11 @@
 
                   else{
                     // Getting denominator values from 2pi
-                    Denominator_y[i_topology][i_detector][i_charge][i_sector]->SetBinContent
+                    Overall_Denominator_y[i_detector][i_charge][i_sector]->SetBinContent
                     (bin_1,pi_Denominator_y[i_detector][i_charge][i_sector]->GetBinContent(bin_1));
 
                     // Getting numerator values from 2pi
-                    Numerator_y[i_topology][i_detector][i_charge][i_sector]->SetBinContent
+                    Overall_Numerator_y[i_detector][i_charge][i_sector]->SetBinContent
                     (bin_1,pi_Numerator_y[i_detector][i_charge][i_sector]->GetBinContent(bin_1));
                   }
                 }
