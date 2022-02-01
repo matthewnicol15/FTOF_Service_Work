@@ -49,7 +49,7 @@ void FTOF_2pi_Missing_Pim(){
   // Defining input and output files
 
   // Data files to process
-  TString inputFile1("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/skim4_005038.hipo");
+  TString inputFile1("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/train/skim4/*.hipo");
   // TString inputFile1("/volatile/clas12/rg-a/production/recon/fall2018/torus+1/pass1/v2/calib/train/skim4/*.hipo");
 
 
@@ -64,7 +64,7 @@ void FTOF_2pi_Missing_Pim(){
   Int_t Bins = files->GetEntries();
 
   // Output file location and name
-  TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGA_FALL2018_Inbending_skim4_5038_2pi_misspim_Test_DC_OFF_Beta_OFF_Cal_OFF_FTOF_OFF_25102021_01.root","recreate");
+  TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGA_FALL2018_Inbending_skim4_2pi_misspim_Test_DC_OFF_Beta_OFF_Cal_OFF_FTOF_OFF_18112021_02.root","recreate");
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Creating vectors and variables
@@ -112,6 +112,8 @@ void FTOF_2pi_Missing_Pim(){
   Double_t start_time = 0;
   Double_t Momentum = 0;
 
+  Double_t delta_beta_pim, beta_tof_pim, beta_calc_pim;
+
   // Reconstructed pi^-
   TLorentzVector misspim;
   // Detected negative particle set to pi^-
@@ -132,6 +134,14 @@ void FTOF_2pi_Missing_Pim(){
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Create histograms here
+
+  // Testing lower counters
+  auto* h_theta_phi_momentum_cal = new TH3F("h_theta_phi_momentum_cal","Angular distribution of particles hitting cal",60,0,60,360,-180,180,200,0,11);
+  auto* h_theta_phi_momentum_nocal = new TH3F("h_theta_phi_momentum_nocal","Angular distribution of particles not hitting cal",60,0,60,360,-180,180,200,0,11);
+  auto* h_pid_cal = new TH1F("h_pid_cal","PID for particles hitting cal",5000,-2500,2500);
+  auto* h_pid_nocal = new TH1F("h_pid_nocal","PID for particles not hitting cal",5000,-2500,2500);
+  auto* h_delta_beta_cal = new TH2F("h_delta_beta_cal","#Delta#Beta against momentum for particles hitting cal",200,0,11,200,-1,1);
+  auto* h_delta_beta_nocal = new TH2F("h_delta_beta_nocal","#Delta#Beta against momentum for particles not hitting cal",200,0,11,200,-1,1);
 
   // 2 pi event histograms
   auto* hmass=new TH1F("hmass","Missing Mass e' p #pi^{+};MM(e'p#pi^{+}) [GeV];Counts",200,-1,1);
@@ -467,6 +477,10 @@ void FTOF_2pi_Missing_Pim(){
                 }
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+                beta_tof_pim = p->par()->getBeta();
+                beta_calc_pim = pim.Rho()/(sqrt((pow(pim.Rho(),2))+(pow(pim.M(),2))));
+                delta_beta_pim = beta_calc_pim-beta_tof_pim;
+
 
                 h_PCAL_Energy->Fill(PCAL_Energy);
                 h_ECIN_Energy->Fill(ECIN_Energy);
@@ -588,6 +602,22 @@ void FTOF_2pi_Missing_Pim(){
                     // Plotting L vs the counter number
                     hlvscounter1A->Fill(Component,L_det_1a);
                   }
+
+                  // Looking at lower counters
+                  if(L_det_1a < 100 && L_det_1a > 80){
+                    // Particles that will not go through the ECAL cut
+                    if(PCAL_Energy == 0 || ECIN_Energy == 0){
+                      h_theta_phi_momentum_nocal->Fill(TMath::RadToDeg()* pim.Theta(), TMath::RadToDeg()* pim.Phi(), pim.Rho());
+                      h_pid_nocal->Fill(p->par()->getPid());
+                      h_delta_beta_nocal->Fill(pim.Rho(),delta_beta_pim);
+                    }
+                    else {
+                      h_theta_phi_momentum_cal->Fill(TMath::RadToDeg()* pim.Theta(), TMath::RadToDeg()* pim.Phi(), pim.Rho());
+                      h_pid_cal->Fill(p->par()->getPid());
+                      h_delta_beta_cal->Fill(pim.Rho(),delta_beta_pim);
+                    }
+                  }
+
 
                   // Determine which sector the hit is in using alpha
                   // Look at positive x (sectors 1,2 and 6)
