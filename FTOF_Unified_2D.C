@@ -1,5 +1,8 @@
 // Set the polarity of the magnetic field for the DC fiducial cuts
-Double_t Polarity = 0; // inbending = 0, outbending = 1, used to set fiducial cut automatically
+Double_t Polarity; // inbending is 0, outbending is 1
+// used to set fiducial cut automatically
+if(polarity == "Inbending" || polarity == "inbending") Polarity = 0;
+if(polarity == "Outbending" || polarity == "outbending") Polarity = 1;
 
 // Set the Run period
 Int_t Run_Period = 1; // RGA Fall 2018 = 1, RGB Spring 2019 = 3
@@ -674,8 +677,8 @@ void Second_Loop(int runno, int i_topology, int i_charge, int i_detector, int i_
 }
 
 // Loading macro
-void FTOF_Unified_2D(){
-  // void FTOF_Unified(TString inFileName){
+// void FTOF_Unified_2D(){
+  void FTOF_Unified_2D(TString inFileName, TString outFileName, TString polarity){
 
   // Creating a TChain of all the input files
   TChain fake("hipo");
@@ -711,7 +714,9 @@ void FTOF_Unified_2D(){
 
   // Defining input and output files
   // Data files to process
-  TString inputFile("~/links/RGA_FALL2018_Inbending_dst/*.hipo");
+  // TString inputFile("~/links/RGA_FALL2018_Inbending_dst/*.hipo");
+  TString inputFile = inFileName;
+  TString outputFile = outFileName;
 
 
   // Adding the different input files to the TChain
@@ -723,7 +728,7 @@ void FTOF_Unified_2D(){
   Int_t Bins = files->GetEntries();
 
   // Output file location and name
-  TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGA_Fall_2018_dst_unified_2D_test_07022022_01.root","recreate");
+  TFile fileOutput1(outputFile,"recreate");
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Defining the arrays of histograms
