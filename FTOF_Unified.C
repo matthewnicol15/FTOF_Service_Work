@@ -1,5 +1,5 @@
 // Set the polarity of the magnetic field for the DC fiducial cuts
-Double_t Polarity = 1; // inbending = 0, outbending = 1, used to set fiducial cut automatically
+Double_t Polarity = 0; // inbending = 0, outbending = 1, used to set fiducial cut automatically
 
 // Set the Run period
 Int_t Run_Period = 1; // RGA Fall 2018 = 1, RGB Spring 2019 = 3
@@ -174,7 +174,6 @@ auto* h_radia_residual_2 = new TH1D("h_radia_residual_2","Radius Residual FTOF1A
 // Arrays of histograms [layer][charge][sector]
 TH3F *h_Denominator[4][3][2][6]; // Trajectories from DC
 TH3F *h_Numerator[4][3][2][6]; // Trajectories from DC with energy deposited in FTOF
-TH3F *h_Efficiency[4][3][2][6]; // Numerator divided by denominator
 
 
 // Define SetLorentzVector for four vectors of particles
@@ -677,12 +676,12 @@ void Second_Loop(int runno, int i_topology, int i_charge, int i_detector, int i_
 void FTOF_Unified(){
   // void FTOF_Unified(TString inFileName){
 
-
+  // Creating a TChain of all the input files
   TChain fake("hipo");
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   //-----------------File Chaining----------------------
-  string ifname="/home/matthewn/File_Lists/RGA_Fall_2018_Inbending_51_file_list.txt";  //list of data files
+  /*string ifname="/home/matthewn/File_Lists/RGA_Fall_2018_Outbending_file_path_list.txt";  //list of data files
   // string ifname=fList;  //list of data files
   int Nfiles = 0;
   vector < string > ifname_hipo;
@@ -705,21 +704,27 @@ void FTOF_Unified(){
     fake.Add((ifname_hipo[ii]).c_str());
 
   }
-
+*/
 
 
 
   // Defining input and output files
   // Data files to process
-  // TString inputFile("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/recon/005038/*.hipo");
+   TString inputFile("/home/matthewn/links/RGA_FALL_2018_Outbending_09022022/50/*.hipo");
+TString inputFile2("/home/matthewn/links/RGA_FALL_2018_Outbending_09022022/51/*.hipo");
+TString inputFile3("/home/matthewn/links/RGA_FALL_2018_Outbending_09022022/52/*.hipo");
+TString inputFile4("/home/matthewn/links/RGA_FALL_2018_Inbending_09022022/53/*.hipo");
+TString inputFile5("/home/matthewn/links/RGA_FALL_2018_Inbending_09022022/54/*.hipo");
 
 
-
-  // Creating a TChain of all the input files
-  // TChain fake("hipo");
   // Adding the different input files to the TChain
-  // fake.Add(inputFile.Data());
-  // fake.Add(inputFile1.Data());
+   fake.Add(inputFile.Data());
+fake.Add(inputFile2.Data());
+fake.Add(inputFile3.Data());
+fake.Add(inputFile4.Data());
+fake.Add(inputFile5.Data());
+
+
 
   // Retrieving list of files
   auto files=fake.GetListOfFiles();
@@ -727,7 +732,7 @@ void FTOF_Unified(){
   Int_t Bins = files->GetEntries();
 
   // Output file location and name
-  TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGA_Fall_2018_51_dst_unified_01022022_03.root","recreate");
+  TFile fileOutput1("/volatile/clas12/matthewn/FTOF/FTOF_Efficiency_RGA_Fall_2018_Inbending_dst_unified_10022022_01.root","recreate");
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Defining the arrays of histograms

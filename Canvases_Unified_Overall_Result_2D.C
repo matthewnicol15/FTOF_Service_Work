@@ -2,7 +2,7 @@
 
 {
   // Give the input analysis file to determine efficieny for
-  TFile *f1=new TFile("/media/mn688/Elements1/PhD/FTOF/FTOF_Efficiency_RGA_Fall_2018_Outbending_dst_unified_2D_test_07022022_01.root");
+  TFile *f1=new TFile("/media/mn688/Elements1/PhD/FTOF/RGA_Spring19_Inbending_22022022_01/RGA_Spring19_Inbending_Total.root");
 
   //////////////////////////////////////////////////////////////////////////////
   ////Define variables for naming and limits ///////////
@@ -17,8 +17,8 @@
   ostringstream Charge;
   ostringstream Sector;
   // Setting the strings for canvas name
-  Data<<"RGA_Fall2018_Outbending_dst";
-  Date<<"08022022";
+  Data<<"RGA_Spring2019_Inbending_dst";
+  Date<<"22022022";
   Version<<"01";
 
 
@@ -135,7 +135,7 @@
         canvas_y_name_stream<<Topology.str().c_str()<<"_"<<Layer.str().c_str()<<"_"<<Charge.str().c_str()<<"_L";
 
         // Setting the file name for each canvas
-        canvas_y_file_name_stream<<"/media/mn688/Elements1/PhD/FTOF/Efficiency_Canvases/RGA_Fall_2018_Outbending_dst_08022022/"<<Data.str().c_str()<<"_"<<Topology.str().c_str()<<"_"<<Layer.str().c_str()<<"_"<<Charge.str().c_str()<<"_"<<Date.str().c_str()<<"_"<<Version.str().c_str()<<".pdf";
+        canvas_y_file_name_stream<<"/media/mn688/Elements1/PhD/FTOF/Efficiency_Canvases/RGA_Spring_2019_Inbending_dst_22022022/"<<Data.str().c_str()<<"_"<<Topology.str().c_str()<<"_"<<Layer.str().c_str()<<"_"<<Charge.str().c_str()<<"_"<<Date.str().c_str()<<"_"<<Version.str().c_str()<<".C";
 
 
         // creating canvas for each topology, FTOF layer, and charge
