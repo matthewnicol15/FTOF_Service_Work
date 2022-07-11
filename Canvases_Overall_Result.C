@@ -2,7 +2,7 @@
 
 {
    // Give the input analysis file to determine efficieny for
-   TFile *f1=new TFile("/media/mn688/Elements1/PhD/FTOF/RGA_Spring19_Inbending_22022022_01/RGA_Spring19_Inbending_Total.root");
+   TFile *f1=new TFile("/media/mn688/Elements1/PhD/FTOF/RGA_Spring19_Inbending_Compare_2pi_singletrack_25052022_01/RGA_Spring19_Inbending_Total.root");
 
    //////////////////////////////////////////////////////////////////////////////
    ////Define variables for naming and limits ///////////
@@ -17,10 +17,11 @@
    ostringstream Charge;
    ostringstream Sector;
    // Setting the strings for canvas name
-   Data<<"RGA_Spring2019_Inbending_dst";
-   Date<<"03052022";
+   Data<<"RGA_Spring19_Inbending_dst_methodcomparison";
+   Date<<"25052022";
    Version<<"01";
 
+   TFile fout("/media/mn688/Elements1/PhD/FTOF/RGA_Spring19_Inbending_Compare_2pi_singletrack_25052022_01/RGA_Spring19_Inbending_Efficiency_Output_27052022.root","recreate");
 
 
    Int_t detector_min, detector_max; // Limits for FTOF layers
@@ -122,7 +123,7 @@
             canvas_y_name_stream<<Topology.str().c_str()<<"_"<<Layer.str().c_str()<<"_"<<Charge.str().c_str()<<"_L";
 
             // Setting the file name for each canvas
-            canvas_y_file_name_stream<<"/media/mn688/Elements1/PhD/FTOF/Efficiency_Canvases/RGA_Spring_2019_Inbending_dst_03052022/"<<Data.str().c_str()<<"_"<<Topology.str().c_str()<<"_"<<Layer.str().c_str()<<"_"<<Charge.str().c_str()<<"_"<<Date.str().c_str()<<"_"<<Version.str().c_str()<<".pdf";
+            canvas_y_file_name_stream<<"/media/mn688/Elements1/PhD/FTOF/Efficiency_Canvases/RGA_Spring19_Inbending_methodcomparison_27052022_01/"<<Data.str().c_str()<<"_"<<Topology.str().c_str()<<"_"<<Layer.str().c_str()<<"_"<<Charge.str().c_str()<<"_"<<Date.str().c_str()<<"_"<<Version.str().c_str()<<".pdf";
 
 
             // creating canvas for each topology, FTOF layer, and charge
@@ -149,7 +150,6 @@
                Denominator_name_stream<<"h_Denominator_Topo_"<<i_topology<<"_Det_"<<i_detector<<"_Charge_"<<i_charge<<"_Sec_"<<i_sector;
                Numerator_name_stream<<"h_Numerator_Topo_"<<i_topology<<"_Det_"<<i_detector<<"_Charge_"<<i_charge<<"_Sec_"<<i_sector;
 
-
                // For 2 pi topologies
                if(i_topology < 3){
                   Efficiency_title_stream<<Topology.str().c_str()<<" Efficiency of FTOF"<<Layer.str().c_str()<<" Sector "<<i_sector + 1<<"; Counter; #epsilon";
@@ -170,8 +170,6 @@
                // Take 1d projection
                Denominator_y[i_topology][i_detector][i_charge][i_sector] = (TH1F*) h_Denominator->ProjectionX(); // denominator
                Numerator_y[i_topology][i_detector][i_charge][i_sector] = (TH1F*) h_Numerator->ProjectionX(); // numerator
-               // Numerator_y_copy[i_topology][i_detector][i_charge][i_sector] = (TH1F*) h_Numerator->ProjectionX(); // numerator copy
-
 
                //////////////////////////////////////////////////////////////////////////////
                // Determine efficieny and error for 2pi and single track method /////////////
@@ -284,7 +282,7 @@
          canvas_y_name_stream<<"Overall_Result_"<<Layer.str().c_str()<<"_"<<Charge.str().c_str()<<"_L";
 
          // Setting the file name for each canvas
-         canvas_y_file_name_stream<<"/media/mn688/Elements1/PhD/FTOF/Efficiency_Canvases/RGA_Spring_2019_Inbending_dst_03052022/"<<Data.str().c_str()<<"_Overall_Result_"<<Layer.str().c_str()<<"_"<<Charge.str().c_str()<<"_"<<Date.str().c_str()<<"_"<<Version.str().c_str()<<".pdf";
+         canvas_y_file_name_stream<<"/media/mn688/Elements1/PhD/FTOF/Efficiency_Canvases/RGA_Spring19_Inbending_methodcomparison_27052022_01/"<<Data.str().c_str()<<"_Overall_Result_"<<Layer.str().c_str()<<"_"<<Charge.str().c_str()<<"_"<<Date.str().c_str()<<"_"<<Version.str().c_str()<<".pdf";
 
 
          // creating canvas for each topology, FTOF layer, and charge
@@ -511,4 +509,6 @@
 
       }
    }
+
+   fout.Write();
 }
