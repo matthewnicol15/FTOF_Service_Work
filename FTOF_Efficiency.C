@@ -91,7 +91,6 @@ Double_t PCAL_Energy, ECIN_Energy, ECOUT_Energy; // ECAL energy depositions
 
 // Timing and beta
 Double_t beta = 0;
-Double_t start_time = 0;
 Double_t Momentum = 0;
 
 // Reconstructed pi^-
@@ -114,69 +113,62 @@ Double_t DeltaP, DeltaTheta, DeltaPhi;
 // Create histograms here
 
 // Checking the counter number vs L
-auto* hlvscounter1A=new TH2F("hlvscounter1A","L vs counter FTOF1A;Counter;L [cm]",24,0,24,500,0,500);
-auto* hlvscounter1B=new TH2F("hlvscounter1B","L vs counter FTOF1B;Counter;L [cm]",63,0,63,500,0,500);
-auto* hlvscounter2=new TH2F("hlvscounter2","L vs counter FTOF2;Counter;L [cm]",6,0,6,300,600,900);
+auto* hlvscounter1A=new TH2F();
+auto* hlvscounter1B=new TH2F();
+auto* hlvscounter2=new TH2F();
 
 // Testing Cuts
 // DC fiducial cut
 // Before
-auto* h_DC_c1_xy_before = new TH2F("h_DC_c1_xy_before","DC layer 1 co-ordinates before fiducial cut",200,-200,200,200,-200,200);
-auto* h_DC_c2_xy_before = new TH2F("h_DC_c2_xy_before","DC layer 2 co-ordinates before fiducial cut",300,-300,300, 300,-300,300);
-auto* h_DC_c3_xy_before = new TH2F("h_DC_c3_xy_before","DC layer 3 co-ordinates before fiducial cut",500,-500,500,500,-500,500);
+auto* h_DC_c1_xy_before = new TH2F();
+auto* h_DC_c2_xy_before = new TH2F();
+auto* h_DC_c3_xy_before = new TH2F();
 // After
-auto* h_DC_c1_xy_after = new TH2F("h_DC_c1_xy_after","DC layer 1 co-ordinates before fiducial cut",200,-200,200,200,-200,200);
-auto* h_DC_c2_xy_after = new TH2F("h_DC_c2_xy_after","DC layer 2 co-ordinates before fiducial cut",300,-300,300,300,-300,300);
-auto* h_DC_c3_xy_after = new TH2F("h_DC_c3_xy_after","DC layer 3 co-ordinates before fiducial cut",500,-500,500,500,-500,500);
+auto* h_DC_c1_xy_after = new TH2F();
+auto* h_DC_c2_xy_after = new TH2F();
+auto* h_DC_c3_xy_after = new TH2F();
 
 // Beta Cut
 // Before
-auto* h_beta=new TH2F("h_beta","beta;P [GeV];beta",1100,0,11,400,-2,2);
+auto* h_beta=new TH2F();
 // After
-auto* h_beta_cut_test=new TH2F("h_beta_cut_test","beta;P [GeV];beta",1100,0,11,400,-2,2);
+auto* h_beta_cut_test=new TH2F();
 
 // Calorimeter Cut
 // Before
-auto* h_PCAL_Energy = new TH1F("h_PCAL_Energy","PCAL energy before calorimeter cut",200,-0.5,1.5);
-auto* h_ECIN_Energy = new TH1F("h_ECIN_Energy","ECIN energy before calorimeter cut",200,-0.5,1.5);
+auto* h_PCAL_Energy = new TH1F();
+auto* h_ECIN_Energy = new TH1F();
 //After
-auto* h_PCAL_Energy_cut_test = new TH1F("h_PCAL_Energy_cut_test","PCAL energy after calorimeter cut",200,-0.5,1.5);
-auto* h_ECIN_Energy_cut_test = new TH1F("h_ECIN_Energy_cut_test","ECIN energy after calorimeter cut",200,-0.5,1.5);
+auto* h_PCAL_Energy_cut_test = new TH1F();
+auto* h_ECIN_Energy_cut_test = new TH1F();
 
 // FTOF fiducial cut
 // Before
-auto* h_FTOF1A_LvsLperp_before = new TH2F("h_FTOF1A_LvsLperp_before","FTOF1A xy before FTOF fiducial cut", 500,-250,250,500,0,500);
-auto* h_FTOF1B_LvsLperp_before = new TH2F("h_FTOF1B_LvsLperp_before","FTOF1B xy before FTOF fiducial cut", 500,-250,250,500,0,500);
-auto* h_FTOF2_LvsLperp_before = new TH2F("h_FTOF2_LvsLperp_before","FTOF2 xy before FTOF fiducial cut", 500,-250,250,500,0,500);
+auto* h_FTOF1A_LvsLperp_before = new TH2F();
+auto* h_FTOF1B_LvsLperp_before = new TH2F();
+auto* h_FTOF2_LvsLperp_before = new TH2F();
 // After
-auto* h_FTOF1A_LvsLperp_after = new TH2F("h_FTOF1A_LvsLperp_after","FTOF1A xy after FTOF fiducial cut", 500,-250,250,500,0,500);
-auto* h_FTOF1B_LvsLperp_after = new TH2F("h_FTOF1B_LvsLperp_after","FTOF1B xy after FTOF fiducial cut", 500,-250,250,500,0,500);
-auto* h_FTOF2_LvsLperp_after = new TH2F("h_FTOF2_LvsLperp_after","FTOF2 xy after FTOF fiducial cut", 500,-250,250,500,0,500);
+auto* h_FTOF1A_LvsLperp_after = new TH2F();
+auto* h_FTOF1B_LvsLperp_after = new TH2F();
+auto* h_FTOF2_LvsLperp_after = new TH2F();
 
 // Particle information
-auto* hMomentum_1A_p=new TH1F("hMomentum_1A_p", "Momentum of positive tracks in FTOF1A; Momentum [GeV/c]; Counts;", 200,0,8);
-auto* hMomentum_1B_p=new TH1F("hMomentum_1B_p", "Momentum of positive tracks in FTOF1A; Momentum [GeV/c]; Counts;", 200,0,8);
-auto* hMomentum_2_p=new TH1F("hMomentum_2_p", "Momentum of positive tracks in FTOF1A; Momentum [GeV/c]; Counts;", 200,0,8);
-auto* hMomentum_1A_n=new TH1F("hMomentum_1A_n", "Momentum of negative tracks in FTOF1A; Momentum [GeV/c]; Counts;", 200,0,8);
-auto* hMomentum_1B_n=new TH1F("hMomentum_1B_n", "Momentum of negative tracks in FTOF1A; Momentum [GeV/c]; Counts;", 200,0,8);
-auto* hMomentum_2_n=new TH1F("hMomentum_2_n", "Momentum of negative tracks in FTOF1A; Momentum [GeV/c]; Counts;", 200,0,8);
-auto *h_z_vertex=new TH1D("h_z_vertex","z vertex",100,-15,15);
-auto *h_Pid=new TH1D("h_Pid","PID after cuts",10000,-5000,5000);
-
-// Event information
-auto* h_start_time=new TH1F("h_start_time","Start time;Start time [ns];Counts",400,0,200);
-
-// Energy deposition in FTOF
-auto* henergy_FTOF1A=new TH2F("henergy_FTOF1A","",23,1,23,200,0,500);
+auto* hMomentum_1A_p=new TH1F();
+auto* hMomentum_1B_p=new TH1F();
+auto* hMomentum_2_p=new TH1F();
+auto* hMomentum_1A_n=new TH1F();
+auto* hMomentum_1B_n=new TH1F();
+auto* hMomentum_2_n=new TH1F();
+auto *h_z_vertex=new TH1D();
+auto *h_Pid=new TH1D();
 
 
-
-
-// Create arrays of 3d histograms for
-// Arrays of histograms [layer][charge][sector]
+// Create arrays of 2d histograms for efficieny
+// Arrays of histograms [topology][layer][charge][sector]
 TH2F *h_Denominator[4][3][2][6]; // Trajectories from DC
 TH2F *h_Numerator[4][3][2][6]; // Trajectories from DC with energy deposited in FTOF
-TH2F *h_Energy_Dep[4][1][3][2][6];
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 // Define SetLorentzVector for four vectors of particles
@@ -186,9 +178,11 @@ void SetLorentzVector(TLorentzVector &p4,clas12::region_part_ptr rp){
 
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Function to produce numerator and denominator histograms
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_charge, int i_detector, int i_sector, vector<region_part_ptr> particles, std::ofstream& myfile, int eventcount){
-// void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_charge, int i_detector, int i_sector, vector<region_part_ptr> particles){
+void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_charge, int i_detector, int i_sector, vector<region_part_ptr> particles){
 
    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
    // 2nd Loop over data to get detector information
@@ -355,10 +349,6 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
          // Testing Beta cut
          h_beta_cut_test->Fill(Momentum,p->par()->getBeta());
 
-         // Getting the start time
-         // start_time = c12.event()->getStartTime();
-         // h_start_time->Fill(c12.event()->getStartTime());
-
          // Getting the PID values
          h_Pid->Fill(p->par()->getPid());
 
@@ -467,12 +457,6 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
                // Check if there is energy deposited on the scintillator for numerator
                if(p->sci(FTOF1A)->getEnergy()){
                   h_Numerator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_1a, L_Perp_1a);
-                  if(i_topology == 4){
-                     if(p->par()->getP() > 0)h_Energy_Dep[0][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_1a, p->sci(FTOF1A)->getEnergy());
-                     if(p->par()->getP() > 0.5 && p->par()->getP() < 1.0)h_Energy_Dep[1][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_1a, p->sci(FTOF1A)->getEnergy());
-                     if(p->par()->getP() > 1.0 && p->par()->getP() < 1.5)h_Energy_Dep[2][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_1a, p->sci(FTOF1A)->getEnergy());
-                     if(p->par()->getP() > 1.5 && p->par()->getP() < 2.0)h_Energy_Dep[3][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_1a, p->sci(FTOF1A)->getEnergy());
-                  }
                }
             }
 
@@ -488,12 +472,6 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
                // Check if there is energy deposited on the scintillator
                if(p->sci(FTOF1A)->getEnergy()){
                   h_Numerator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_1a, L_Perp_1a);
-                  if(i_topology == 4){
-                     if(p->par()->getP() > 0)h_Energy_Dep[0][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_1a, p->sci(FTOF1A)->getEnergy());
-                     if(p->par()->getP() > 0.5 && p->par()->getP() < 1.0)h_Energy_Dep[1][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_1a, p->sci(FTOF1A)->getEnergy());
-                     if(p->par()->getP() > 1.0 && p->par()->getP() < 1.5)h_Energy_Dep[2][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_1a, p->sci(FTOF1A)->getEnergy());
-                     if(p->par()->getP() > 1.5 && p->par()->getP() < 2.0)h_Energy_Dep[3][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_1a, p->sci(FTOF1A)->getEnergy());
-                  }
                }
             }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -577,24 +555,8 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
                   // Determining sector for filling histograms
                   if(alpha_1b > 30) i_sector = 2;
                   else if(fabs(alpha_1b) < 30) i_sector = 1;
-                  else if(alpha_1b < -30){
+                  else if(alpha_1b < -30) i_sector = 6;
 
-                     i_sector = 6;
-
-                     // Sector 6 issues test
-                     // Checking that it is single track method, negative particles
-                     if(i_topology == 4 && i_charge == 0 && p->sci(FTOF1B)->getEnergy() == 0 && eventcount < 1001){
-                        //
-                        // if(h_Denominator[i_topology-1][i_detector][i_charge][i_sector - 1]->GetXaxis()->FindBin(L_det_1b) > 33 && h_Denominator[i_topology-1][i_detector][i_charge][i_sector - 1]->GetXaxis()->FindBin(L_det_1b) < 49 ){
-
-                        // cout<< "runno " << runno << " eventno " << eventno << " pindex " << pindex <<
-                        // " PID " << p->par()->getPid() << " counter " << h_Denominator[i_topology-1][i_detector][i_charge][i_sector - 1]->GetXaxis()->FindBin(L_det_1b) - 1 << endl;
-
-                        myfile << "runno " << runno << " eventno " << eventno << " pindex " << pindex <<
-                        " PID " << p->par()->getPid() << " counter " << h_Denominator[i_topology-1][i_detector][i_charge][i_sector - 1]->GetXaxis()->FindBin(L_det_1b) - 1 << "\n";
-                        eventcount++;
-                        // }
-                     }
                   }
 
                   // Filling numerator and denominator histograms
@@ -602,12 +564,6 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
                   // Check if there is energy deposited on the scintillator
                   if(p->sci(FTOF1B)->getEnergy()){
                      h_Numerator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_1b, L_Perp_1b);
-                     if(i_topology == 4){
-                        if(p->par()->getP() > 0)h_Energy_Dep[0][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_1b, p->sci(FTOF1B)->getEnergy());
-                        if(p->par()->getP() > 0.5 && p->par()->getP() < 1.0)h_Energy_Dep[1][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_1b, p->sci(FTOF1B)->getEnergy());
-                        if(p->par()->getP() > 1.0 && p->par()->getP() < 1.5)h_Energy_Dep[2][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_1b, p->sci(FTOF1B)->getEnergy());
-                        if(p->par()->getP() > 1.5 && p->par()->getP() < 2.0)h_Energy_Dep[3][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_1b, p->sci(FTOF1B)->getEnergy());
-                     }
                   }
                }
 
@@ -624,12 +580,6 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
                   // Check if there is energy deposited on the scintillator
                   if(p->sci(FTOF1B)->getEnergy()){
                      h_Numerator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_1b, L_Perp_1b);
-                     if(i_topology == 4){
-                        if(p->par()->getP() > 0)h_Energy_Dep[0][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_1b, p->sci(FTOF1B)->getEnergy());
-                        if(p->par()->getP() > 0.5 && p->par()->getP() < 1.0)h_Energy_Dep[1][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_1b, p->sci(FTOF1B)->getEnergy());
-                        if(p->par()->getP() > 1.0 && p->par()->getP() < 1.5)h_Energy_Dep[2][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_1b, p->sci(FTOF1B)->getEnergy());
-                        if(p->par()->getP() > 1.5 && p->par()->getP() < 2.0)h_Energy_Dep[3][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_1b, p->sci(FTOF1B)->getEnergy());
-                     }
                   }
                }
             }
@@ -715,12 +665,6 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
                   // Check if there is energy deposited on the scintillator
                   if(p->sci(FTOF2)->getEnergy()){
                      h_Numerator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_2, L_Perp_2);
-                     if(i_topology == 4){
-                        if(p->par()->getP() > 0)h_Energy_Dep[0][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_2, p->sci(FTOF2)->getEnergy());
-                        if(p->par()->getP() > 0.5 && p->par()->getP() < 1.0)h_Energy_Dep[1][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_2, p->sci(FTOF2)->getEnergy());
-                        if(p->par()->getP() > 1.0 && p->par()->getP() < 1.5)h_Energy_Dep[2][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_2, p->sci(FTOF2)->getEnergy());
-                        if(p->par()->getP() > 1.5 && p->par()->getP() < 2.0)h_Energy_Dep[3][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_2, p->sci(FTOF2)->getEnergy());
-                     }
                   }
                }
 
@@ -737,12 +681,6 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
                   // Check if there is energy deposited on the scintillator
                   if(p->sci(FTOF2)->getEnergy()){
                      h_Numerator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_2, L_Perp_2);
-                     if(i_topology == 4){
-                        if(p->par()->getP() > 0)h_Energy_Dep[0][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_2, p->sci(FTOF2)->getEnergy());
-                        if(p->par()->getP() > 0.5 && p->par()->getP() < 1.0)h_Energy_Dep[1][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_2, p->sci(FTOF2)->getEnergy());
-                        if(p->par()->getP() > 1.0 && p->par()->getP() < 1.5)h_Energy_Dep[2][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_2, p->sci(FTOF2)->getEnergy());
-                        if(p->par()->getP() > 1.5 && p->par()->getP() < 2.0)h_Energy_Dep[3][0][i_detector][i_charge][i_sector - 1]->Fill(L_det_2, p->sci(FTOF2)->getEnergy());
-                     }
                   }
                }
             }
@@ -752,19 +690,11 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
 }
 
 // Loading macro
-void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity, TString textfilename){
-// void FTOF_Unified_2D_Edep(TString inFileName, TString outFileName, TString polarity){
+void FTOF_Unified_2D_Edep(TString inFileName, TString outFileName, TString polarity){
 
    // Creating a TChain of all the input files
    TChain fake("hipo");
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-   ofstream myfile;
-   TString txtfilename = textfilename;
-
-   myfile.open (txtfilename);
-   cout<<txtfilename<<endl;
-
 
    // Defining input and output files
    // Data files to process
@@ -798,6 +728,58 @@ void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity, 
    Int_t eventcount=0;
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   // Defining histograms
+
+   // Checking the counter number vs L
+   hlvscounter1A=new TH2F("hlvscounter1A","L vs counter FTOF1A;Counter;L [cm]",24,0,24,500,0,500);
+   hlvscounter1B=new TH2F("hlvscounter1B","L vs counter FTOF1B;Counter;L [cm]",63,0,63,500,0,500);
+   hlvscounter2=new TH2F("hlvscounter2","L vs counter FTOF2;Counter;L [cm]",6,0,6,300,600,900);
+
+   // Testing Cuts
+   // DC fiducial cut
+   // Before
+   h_DC_c1_xy_before = new TH2F("h_DC_c1_xy_before","DC layer 1 co-ordinates before fiducial cut",200,-200,200,200,-200,200);
+   h_DC_c2_xy_before = new TH2F("h_DC_c2_xy_before","DC layer 2 co-ordinates before fiducial cut",300,-300,300, 300,-300,300);
+   h_DC_c3_xy_before = new TH2F("h_DC_c3_xy_before","DC layer 3 co-ordinates before fiducial cut",500,-500,500,500,-500,500);
+   // After
+   h_DC_c1_xy_after = new TH2F("h_DC_c1_xy_after","DC layer 1 co-ordinates before fiducial cut",200,-200,200,200,-200,200);
+   h_DC_c2_xy_after = new TH2F("h_DC_c2_xy_after","DC layer 2 co-ordinates before fiducial cut",300,-300,300,300,-300,300);
+   h_DC_c3_xy_after = new TH2F("h_DC_c3_xy_after","DC layer 3 co-ordinates before fiducial cut",500,-500,500,500,-500,500);
+
+   // Beta Cut
+   // Before
+   h_beta=new TH2F("h_beta","beta;P [GeV];beta",1100,0,11,400,-2,2);
+   // After
+   h_beta_cut_test=new TH2F("h_beta_cut_test","beta;P [GeV];beta",1100,0,11,400,-2,2);
+
+   // Calorimeter Cut
+   // Before
+   h_PCAL_Energy = new TH1F("h_PCAL_Energy","PCAL energy before calorimeter cut",200,-0.5,1.5);
+   h_ECIN_Energy = new TH1F("h_ECIN_Energy","ECIN energy before calorimeter cut",200,-0.5,1.5);
+   //After
+   h_PCAL_Energy_cut_test = new TH1F("h_PCAL_Energy_cut_test","PCAL energy after calorimeter cut",200,-0.5,1.5);
+   h_ECIN_Energy_cut_test = new TH1F("h_ECIN_Energy_cut_test","ECIN energy after calorimeter cut",200,-0.5,1.5);
+
+   // FTOF fiducial cut
+   // Before
+   h_FTOF1A_LvsLperp_before = new TH2F("h_FTOF1A_LvsLperp_before","FTOF1A xy before FTOF fiducial cut", 500,-250,250,500,0,500);
+   h_FTOF1B_LvsLperp_before = new TH2F("h_FTOF1B_LvsLperp_before","FTOF1B xy before FTOF fiducial cut", 500,-250,250,500,0,500);
+   h_FTOF2_LvsLperp_before = new TH2F("h_FTOF2_LvsLperp_before","FTOF2 xy before FTOF fiducial cut", 500,-250,250,500,0,500);
+   // After
+   h_FTOF1A_LvsLperp_after = new TH2F("h_FTOF1A_LvsLperp_after","FTOF1A xy after FTOF fiducial cut", 500,-250,250,500,0,500);
+   h_FTOF1B_LvsLperp_after = new TH2F("h_FTOF1B_LvsLperp_after","FTOF1B xy after FTOF fiducial cut", 500,-250,250,500,0,500);
+   h_FTOF2_LvsLperp_after = new TH2F("h_FTOF2_LvsLperp_after","FTOF2 xy after FTOF fiducial cut", 500,-250,250,500,0,500);
+
+   // Particle information
+   hMomentum_1A_p=new TH1F("hMomentum_1A_p", "Momentum of positive tracks in FTOF1A; Momentum [GeV/c]; Counts;", 200,0,8);
+   hMomentum_1B_p=new TH1F("hMomentum_1B_p", "Momentum of positive tracks in FTOF1B; Momentum [GeV/c]; Counts;", 200,0,8);
+   hMomentum_2_p=new TH1F("hMomentum_2_p", "Momentum of positive tracks in FTOF2; Momentum [GeV/c]; Counts;", 200,0,8);
+   hMomentum_1A_n=new TH1F("hMomentum_1A_n", "Momentum of negative tracks in FTOF1A; Momentum [GeV/c]; Counts;", 200,0,8);
+   hMomentum_1B_n=new TH1F("hMomentum_1B_n", "Momentum of negative tracks in FTOF1B; Momentum [GeV/c]; Counts;", 200,0,8);
+   hMomentum_2_n=new TH1F("hMomentum_2_n", "Momentum of negative tracks in FTOF2; Momentum [GeV/c]; Counts;", 200,0,8);
+   auto *h_z_vertex=new TH1D("h_z_vertex","z vertex",100,-15,15);
+   auto *h_Pid=new TH1D("h_Pid","PID after cuts",10000,-5000,5000);
+
    // Defining the arrays of histograms
 
    // Looping over the 4 topologies
@@ -814,7 +796,7 @@ void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity, 
 
                // Histogram names
                ostringstream Denominator_name_stream;
-               ostringstream Numerator_name_stream, Energy_name_stream;
+               ostringstream Numerator_name_stream;
 
                // Histogram Titles
                ostringstream Denominator_title_stream;
@@ -835,17 +817,6 @@ void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity, 
                   // FTOF 1A last counter ends at L = 426.3 cm
                   h_Denominator[i_topo][i_detector][i_charge][i_sector] = new TH2F(Denominator_name_stream.str().c_str(),"", 25, 61.98, 441.48, 50, -250, 250);
                   h_Numerator[i_topo][i_detector][i_charge][i_sector] = new TH2F(Numerator_name_stream.str().c_str(),"", 25, 61.98, 441.48, 50, -250 , 250);
-                  if(i_topo == 3){
-                     for(int i_momentum = 0;i_momentum < 4; i_momentum++){
-                        Energy_name_stream<<"h_Energy_Topo_"<<i_topo<<"_Det_"<<i_detector<<"_Charge_"<<i_charge<<"_Sec_"<<i_sector<<"_MomCut_"<<i_momentum;
-                        h_Energy_Dep[i_momentum][0][i_detector][i_charge][i_sector] = new TH2F(Energy_name_stream.str().c_str(),"", 25, 61.98, 441.48,500,0,100);
-                     }
-                  }
-
-                  // High binning to check FTOF geometry
-                  // h_Denominator[i_detector][i_charge][i_sector] = new TH2F(Denominator_name_stream.str().c_str(),"",  1000, 61.98, 441.48, 50, -250, 250);
-                  // h_Numerator[i_detector][i_charge][i_sector] = new TH2F(Numerator_name_stream.str().c_str(),"",  1000, 61.98, 441.48, 50, -250 , 250);
-
                }
 
                // FTOF1B
@@ -859,15 +830,6 @@ void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity, 
                   // Last counter ends at L = 431.6 cm
                   h_Denominator[i_topo][i_detector][i_charge][i_sector] = new TH2F(Denominator_name_stream.str().c_str(),"", 65, 46.04, 443.84, 50, -250, 250);
                   h_Numerator[i_topo][i_detector][i_charge][i_sector] = new TH2F(Numerator_name_stream.str().c_str(),"", 65, 46.04, 443.84, 50, -250 , 250);
-                  if(i_topo == 3){
-                     for(int i_momentum = 0;i_momentum < 4; i_momentum++){
-                        Energy_name_stream<<"h_Energy_Topo_"<<i_topo<<"_Det_"<<i_detector<<"_Charge_"<<i_charge<<"_Sec_"<<i_sector<<"_MomCut_"<<i_momentum;
-                        h_Energy_Dep[i_momentum][0][i_detector][i_charge][i_sector] = new TH2F(Energy_name_stream.str().c_str(),"", 65, 46.04, 443.84,500,0,100);
-                     }
-                  }
-                  // High binning to check FTOF geometry
-                  // h_Denominator[i_detector][i_charge][i_sector] = new TH2F(Denominator_name_stream.str().c_str(),"",  1000, 46.04, 443.84, 50, -250, 250);
-                  // h_Numerator[i_detector][i_charge][i_sector] = new TH2F(Numerator_name_stream.str().c_str(),"",  1000, 46.04, 443.84, 50, -250 , 250);
                }
 
                // FTOF2
@@ -881,12 +843,6 @@ void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity, 
                   // Last counter ends at L = 825 cm
                   h_Denominator[i_topo][i_detector][i_charge][i_sector] = new TH2F(Denominator_name_stream.str().c_str(),"", 7, 693, 847, 50, -250, 250);
                   h_Numerator[i_topo][i_detector][i_charge][i_sector] = new TH2F(Numerator_name_stream.str().c_str(),"", 7, 693, 847, 50, -250 , 250);
-                  if(i_topo == 3){
-                     for(int i_momentum = 0;i_momentum < 4; i_momentum++){
-                        Energy_name_stream<<"h_Energy_Topo_"<<i_topo<<"_Det_"<<i_detector<<"_Charge_"<<i_charge<<"_Sec_"<<i_sector<<"_MomCut_"<<i_momentum;
-                        h_Energy_Dep[i_momentum][0][i_detector][i_charge][i_sector] = new TH2F(Energy_name_stream.str().c_str(),"", 7, 693, 847,500,0,100);
-                     }
-                  }
                }
 
 
@@ -898,33 +854,6 @@ void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity, 
       }
    }
 
-
-   Int_t bins[4] = {200,400,360,360};
-   Double_t xmin_pi[4] = {-1., -2., -180., -180.};
-   Double_t xmax_pi[4] = {1., 2., 180., 180.};
-   Double_t xmin_p[4] = {0., -2., -180., -180.};
-   Double_t xmax_p[4] = {2., 2., 180., 180.};
-
-   // 2 pi event histograms
-   // auto* hrecon_pim=new THnSparseF("hrecon_pim","Reconstructed #pi^{-};MM^{2}(e'p #pi^{+}) [GeV^{2}];#Delta P [GeV];#Delta #theta [deg];#Delta #phi [deg]",4,bins, xmin_pi, xmax_pi);
-   // auto* hrecon_pip=new THnSparseF("hrecon_pip","Reconstructed #pi^{+};MM^{2}(e'p #pi^{-}) [GeV^{2}];#Delta P [GeV];#Delta #theta [deg];#Delta #phi [deg]",4,bins, xmin_pi, xmax_pi);
-   // auto* hrecon_p=new THnSparseF("hrecon_p","Reconstructed p;MM(e'#pi^{+} #pi^{-}) [GeV];#Delta P [GeV];#Delta #theta [deg];#Delta #phi [deg]",4,bins, xmin_p, xmax_p);
-   // auto* hmass_pip=new TH1F("hmass_pip","Missing Mass e' p #pi^{+};MM^{2}(e'p #pi^{-}) [GeV^{2}];Counts",200,-1,1);
-   // auto* hmass_pr=new TH1F("hmass_pr","Missing Mass e' p #pi^{+};MM(e'#pi^{-} #pi^{+}) [GeV];Counts",200,0,2);
-   // auto* hdeltaP_pim=new TH1F("hdeltaP_pim","Momentum difference of #pi^{-} detected and reconstructed;#Delta P [GeV];Counts",400,-2,2);
-   // auto* hdeltaP_pip=new TH1F("hdeltaP_pip","Momentum difference of #pi^{+} detected and reconstructed;#Delta P [GeV];Counts",400,-2,2);
-   // auto* hdeltaP_pr=new TH1F("hdeltaP_pr","Momentum difference of p detected and reconstructed;#Delta P [GeV];Counts",400,-2,2);
-   // auto* hdeltaTheta_pim=new TH1F("hdeltaTheta_pim","#theta difference of #pi^{-} detected and reconstructed;#Delta #theta [deg];Counts",360,-180,180);
-   // auto* hdeltaTheta_pip=new TH1F("hdeltaTheta_pip","#theta difference of #pi^{+} detected and reconstructed;#Delta #theta [deg];Counts",360,-180,180);
-   // auto* hdeltaTheta_pr=new TH1F("hdeltaTheta_pr","#theta difference of p detected and reconstructed;#Delta #theta [deg];Counts",360,-180,180);
-   // auto* hdeltaPhi_pim=new TH1F("hdeltaPhi_pim","#phi difference of #pi^{-} detected and reconstructed;#Delta #phi [deg];Counts",360,-180,180);
-   // auto* hdeltaPhi_pip=new TH1F("hdeltaPhi_pip","#phi difference of #pi^{+} detected and reconstructed;#Delta #phi [deg];Counts",360,-180,180);
-   // auto* hdeltaPhi_pr=new TH1F("hdeltaPhi_pr","#phi difference of p detected and reconstructed;#Delta #phi [deg];Counts",360,-180,180);
-
-   // Distance between DC trajectory and scintillator hit
-   auto* h_radia_residual_1A = new TH1D("h_radia_residual_1A","Radius Residual FTOF1A",300,0,30);
-   auto* h_radia_residual_1B = new TH1D("h_radia_residual_1B","Radius Residual FTOF1B",300,0,30);
-   auto* h_radia_residual_2 = new TH1D("h_radia_residual_2","Radius Residual FTOF2",300,0,30);
 
    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
    // 1st Loop over data to find 2pi events
@@ -1010,8 +939,7 @@ void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity, 
          if(electrons[0]->getRegion() != FD) continue;
 
          // Perform efficieny calculations for single track events
-         // Second_Loop(runno, eventno, Polarity, 4, -1, -1, -1, particles);
-         Second_Loop(runno, eventno, Polarity, 4, -1, -1, -1, particles, myfile, eventcount);
+         Second_Loop(runno, eventno, Polarity, 4, -1, -1, -1, particles);
 
          // Checking run period for beam energy
          // Setting the beam energy
@@ -1052,19 +980,15 @@ void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity, 
             Pim_values[1] = DeltaP;
             Pim_values[2] = DeltaTheta;
             Pim_values[3] = DeltaPhi;
-            // Plotting pi^- variables
-            // hrecon_pim->Fill(Pim_values);
 
             // Cut on missing mass of the pi^-
             if(misspim.M2() > - 0.1 && misspim.M2() < 0.2){
-
 
                // Cuts to delta P, theta and phi to select true pi^-
                if(fabs(DeltaP) < 0.3 && fabs(DeltaTheta) < 10 && fabs(DeltaPhi) < 10 ){
 
                   // Run through Second_Loop to fill histograms for this topology
-                  Second_Loop(runno, eventno, Polarity, 1, -1, -1, -1, particles, myfile, eventcount);
-                  // Second_Loop(runno, eventno, Polarity, 1, -1, -1, -1, particles);
+                  Second_Loop(runno, eventno, Polarity, 1, -1, -1, -1, particles);
 
                }
             }
@@ -1102,8 +1026,7 @@ void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity, 
                if(fabs(DeltaP) < 0.3 && fabs(DeltaTheta) < 10 && fabs(DeltaPhi) < 10 ){
 
                   // Run through Second_Loop to fill histograms for this topology
-                  Second_Loop(runno, eventno, Polarity, 2, -1, -1, -1, particles, myfile, eventcount);
-                  // Second_Loop(runno, eventno, Polarity, 2, -1, -1, -1, particles);
+                  Second_Loop(runno, eventno, Polarity, 2, -1, -1, -1, particles);
 
                }
             }
@@ -1140,8 +1063,7 @@ void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity, 
                if(fabs(DeltaP) < 0.3 && fabs(DeltaTheta) < 10 && fabs(DeltaPhi) < 10 ){
 
                   // Run through Second_Loop to fill histograms for this topology
-                  Second_Loop(runno, eventno, Polarity, 3, -1, -1, -1, particles, myfile, eventcount);
-                  // Second_Loop(runno, eventno, Polarity, 3, -1, -1, -1, particles);
+                  Second_Loop(runno, eventno, Polarity, 3, -1, -1, -1, particles);
 
                }
             }
@@ -1151,6 +1073,6 @@ void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity, 
    }
    //saving the file
    fileOutput1.Write();
-   myfile.close();
-   return 0;
+   fileOutput1.Close();
+
 }
