@@ -1,7 +1,7 @@
 
 
 // Set the Run period
-Int_t Run_Period = 1; // RGA Fall 2018 = 1, RGA Spring 2019 = 2, RGB Spring 2019 = 3
+Int_t Run_Period = 2; // RGA Fall 2018 = 1, RGA Spring 2019 = 2, RGB Spring 2019 = 3
 
 // Does this skip this loop or the whole event? as it might remove events from
 // missing pip or missing proton
@@ -171,10 +171,6 @@ auto* henergy_FTOF1A=new TH2F("henergy_FTOF1A","",23,1,23,200,0,500);
 
 
 
-// Distance between DC trajectory and scintillator hit
-auto* h_radia_residual_1A = new TH1D("h_radia_residual_1A","Radius Residual FTOF1A",300,0,30);
-auto* h_radia_residual_1B = new TH1D("h_radia_residual_1B","Radius Residual FTOF1A",300,0,30);
-auto* h_radia_residual_2 = new TH1D("h_radia_residual_2","Radius Residual FTOF1A",300,0,30);
 
 // Create arrays of 3d histograms for
 // Arrays of histograms [layer][charge][sector]
@@ -211,6 +207,7 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
          //Ignore the first particle (trigger), any neutrals, and electrons
          // if(p->par()->getCharge()==0 || p->par()->getPid()!=11) continue;
          if(pindex==1 || p->par()->getCharge()==0 || p->par()->getPid()==11) continue;
+         // if(p->par()->getCharge()==0) continue;
 
          if(p->par()->getCharge() < 0) i_charge = 0;
          else if(p->par()->getCharge() > 0) i_charge = 1;
@@ -392,7 +389,7 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
 
                // Distance between DC and FTOF co-ordinates
                radia_residual = sqrt(pow(x_1a-x_FTOF,2) + pow(y_1a-y_FTOF,2) + pow(z_1a-z_FTOF,2));
-               h_radia_residual_1A->Fill(radia_residual);
+               // h_radia_residual_1A->Fill(radia_residual);
             }
 
             // Calculating distance to DC trajectory from (0,0)
@@ -512,7 +509,12 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
 
                   // Distance between DC and FTOF co-ordinates
                   radia_residual = sqrt(pow(x_1b-x_FTOF,2) + pow(y_1b-y_FTOF,2) + pow(z_1b-z_FTOF,2));
-                  h_radia_residual_1B->Fill(radia_residual);
+                  // h_radia_residual_1B->Fill(radia_residual);
+               }
+
+               else{
+
+
                }
 
                // Calculating d, distance to hit from (0,0) to (x,y)
@@ -562,6 +564,18 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
                   else if(alpha_1b < -30){
 
                      i_sector = 6;
+
+                     // // Sector 6 issues test
+                     // // Checking that it is single track method, negative particles
+                     // if(i_topology == 4 && i_charge == 0 && p->sci(FTOF1B)->getEnergy() == 0){
+                     //    //
+                     //    if(h_Denominator[i_topology-1][i_detector][i_charge][i_sector - 1]->GetXaxis()->FindBin(L_det_1b) > 33 && h_Denominator[i_topology-1][i_detector][i_charge][i_sector - 1]->GetXaxis()->FindBin(L_det_1b) < 49 ){
+                     //
+                     //       cout<< "runno " << runno << " eventno " << eventno << " pindex " << pindex <<
+                     //       " PID " << p->par()->getPid() << " counter " << h_Denominator[i_topology-1][i_detector][i_charge][i_sector - 1]->GetXaxis()->FindBin(L_det_1b) - 1 << endl;
+                     //
+                     //    }
+                     // }
                   }
 
                   // Filling numerator and denominator histograms
@@ -612,7 +626,7 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
 
                   // Distance between DC and FTOF co-ordinates
                   radia_residual = sqrt(pow(x_2-x_FTOF,2) + pow(y_2-y_FTOF,2) + pow(z_2-z_FTOF,2));
-                  h_radia_residual_2->Fill(radia_residual);
+                  // h_radia_residual_2->Fill(radia_residual);
                }
 
                // Calculating d, distance to hit from (0,0) to (x,y)
@@ -687,8 +701,8 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
 }
 
 // Loading macro
-void FTOF_Unified_2D(){
-   // void FTOF_Unified_2D(TString inFileName, TString outFileName, TString polarity){
+// void FTOF_Unified_2D(){
+   void FTOF_Unified_2D(TString inFileName, TString outFileName, TString polarity){
 
    // Creating a TChain of all the input files
    TChain fake("hipo");
@@ -724,13 +738,19 @@ void FTOF_Unified_2D(){
 
    // Defining input and output files
    // Data files to process
-   TString inputFile("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/recon/005032/*.hipo");
-   // TString inputFile = inFileName;
-   // TString outputFile = outFileName;
+   // TString inputFile("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/recon/005032/*.hipo");
+   // TString inputFile2("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/recon/005036/*.hipo");
+   // TString inputFile3("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/recon/005038/*.hipo");
+   // TString inputFile4("/cache/clas12/rg-a/production/recon/fall2018/torus-1/pass1/v0/dst/recon/005039/*.hipo");
+   TString inputFile = inFileName;
+   TString outputFile = outFileName;
 
 
    // Adding the different input files to the TChain
    fake.Add(inputFile.Data());
+   // fake.Add(inputFile2.Data());
+   // fake.Add(inputFile3.Data());
+   // fake.Add(inputFile4.Data());
 
    // Retrieving list of files
    auto files=fake.GetListOfFiles();
@@ -738,17 +758,17 @@ void FTOF_Unified_2D(){
    Int_t Bins = files->GetEntries();
 
    // Output file location and name
-   TFile fileOutput1("Energy_Test.root","recreate");
-   // TFile fileOutput1(outputFile,"recreate");
+   // TFile fileOutput1("FTOF1B_Sector_6_Check_29042022_01.root","recreate");
+   TFile fileOutput1(outputFile,"recreate");
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
    // Set the polarity of the magnetic field for the DC fiducial cuts
 
    Double_t Polarity; // inbending is 0, outbending is 1
    // used to set fiducial cut automatically
-   // if(polarity == "Inbending" || polarity == "inbending") Polarity = 0;
-   // if(polarity == "Outbending" || polarity == "outbending") Polarity = 1;
-   Polarity = 1;
+   if(polarity == "Inbending" || polarity == "inbending") Polarity = 0;
+   if(polarity == "Outbending" || polarity == "outbending") Polarity = 1;
+   // Polarity = 1;
 
    Double_t Pim_values[4];
 
@@ -860,6 +880,11 @@ void FTOF_Unified_2D(){
    // auto* hdeltaPhi_pim=new TH1F("hdeltaPhi_pim","#phi difference of #pi^{-} detected and reconstructed;#Delta #phi [deg];Counts",360,-180,180);
    // auto* hdeltaPhi_pip=new TH1F("hdeltaPhi_pip","#phi difference of #pi^{+} detected and reconstructed;#Delta #phi [deg];Counts",360,-180,180);
    // auto* hdeltaPhi_pr=new TH1F("hdeltaPhi_pr","#phi difference of p detected and reconstructed;#Delta #phi [deg];Counts",360,-180,180);
+
+   // Distance between DC trajectory and scintillator hit
+   auto* h_radia_residual_1A = new TH1D("h_radia_residual_1A","Radius Residual FTOF1A",300,0,30);
+   auto* h_radia_residual_1B = new TH1D("h_radia_residual_1B","Radius Residual FTOF1B",300,0,30);
+   auto* h_radia_residual_2 = new TH1D("h_radia_residual_2","Radius Residual FTOF2",300,0,30);
 
    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
    // 1st Loop over data to find 2pi events
