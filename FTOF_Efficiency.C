@@ -3,11 +3,6 @@
 // Set the Run period
 Int_t Run_Period = 2; // RGA Fall 2018 = 1, RGA Spring 2019 = 2, RGB Spring 2019 = 3
 
-// Does this skip this loop or the whole event? as it might remove events from
-// missing pip or missing proton
-// if(i_topology == 1){
-//   if(i_charge == 1) continue;
-// }
 
 #include "DC_Fiducial_Cuts_CLAS12.cxx"
 #include <iostream>
@@ -159,7 +154,7 @@ auto* hMomentum_2_p=new TH1F();
 auto* hMomentum_1A_n=new TH1F();
 auto* hMomentum_1B_n=new TH1F();
 auto* hMomentum_2_n=new TH1F();
-auto *h_z_vertex=new TH1D();
+auto *h_z_vertex_before=new TH1D();
 auto *h_Pid=new TH1D();
 
 
@@ -238,8 +233,9 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
          }
 
          // Checking the z vertex before applying a cut
-         h_z_vertex->Fill(p->par()->getVz());
+         h_z_vertex_before->Fill(p->par()->getVz());
          if(p->par()->getVz() > 2 || p->par()->getVz() < -9)continue;
+         h_z_vertex_after->Fill(p->par()->getVz());
 
          // Setting calorimeter energy values to zero
          PCAL_Energy = 0;
@@ -765,11 +761,13 @@ void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity){
    hMomentum_1A_n=new TH1F("hMomentum_1A_n", "Momentum of negative tracks in FTOF1A; Momentum [GeV/c]; Counts;", 200,0,8);
    hMomentum_1B_n=new TH1F("hMomentum_1B_n", "Momentum of negative tracks in FTOF1B; Momentum [GeV/c]; Counts;", 200,0,8);
    hMomentum_2_n=new TH1F("hMomentum_2_n", "Momentum of negative tracks in FTOF2; Momentum [GeV/c]; Counts;", 200,0,8);
-   auto *h_z_vertex=new TH1D("h_z_vertex","z vertex",100,-15,15);
-   auto *h_Pid=new TH1D("h_Pid","PID after cuts",10000,-5000,5000);
+   h_z_vertex_before=new TH1D("h_z_vertex_before","z vertex",100,-15,15);
+   h_z_vertex_after=new TH1D("h_z_vertex_after","z vertex",100,-15,15);
+
+   h_Pid=new TH1D("h_Pid","PID after cuts",10000,-5000,5000);
+
 
    // Defining the arrays of histograms
-
    // Looping over the 4 topologies
    for(Int_t i_topo = 0; i_topo < 4; i_topo++){
       // Looping over the 3 FTOF layers (FTOF1A, FTOF1B and FTOF2)
