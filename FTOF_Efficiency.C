@@ -200,19 +200,17 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
          pindex++;
 
          //Ignore the first particle (trigger), any neutrals, and electrons
-         // if(p->par()->getCharge()==0 || p->par()->getPid()!=11) continue;
-         // if(pindex==1 || p->par()->getCharge()==0 || p->par()->getPid()==11) continue;
-         if(p->par()->getCharge()==0) continue;
+         if(pindex==1 || p->par()->getCharge()==0 || p->par()->getPid()==11) continue;
 
          if(p->par()->getCharge() < 0) i_charge = 0;
          else if(p->par()->getCharge() > 0) i_charge = 1;
 
-         // Applying cuts based on method
+         // Applying cuts based on topology
          // Turn off all cuts for 2 pi method
          if(i_topology < 4){
-            DC_Fiducial_Cuts = 1; // DC fiducial cuts off
-            Beta_Cut = 1; // Beta cut off
-            Calorimeter_Cut = 1; // Calorimeter cut off
+            DC_Fiducial_Cuts = 0; // DC fiducial cuts off
+            Beta_Cut = 0; // Beta cut off
+            Calorimeter_Cut = 0; // Calorimeter cut off
             FTOF_Fiducial_Cuts = 0; // FTOF fiducial cut off
 
             // For missing pim, ignore all positive particles
@@ -380,7 +378,7 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
 
                // Distance between DC and FTOF co-ordinates
                radia_residual = sqrt(pow(x_1a-x_FTOF,2) + pow(y_1a-y_FTOF,2) + pow(z_1a-z_FTOF,2));
-               // h_radia_residual_1A->Fill(radia_residual);
+               h_radia_residual_1A->Fill(radia_residual);
             }
 
             // Calculating distance to DC trajectory from (0,0)
@@ -431,7 +429,7 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
             // Testing FTOF fiducial cut
             h_FTOF1A_LvsLperp_after->Fill(L_Perp_1a, L_det_1a);
 
-            // Resetting the component to unphysical value
+            // Resetting the component to unphysical value as check
             Component = -10;
 
             // Checking if there is energy deposition in FTOF1A
@@ -503,7 +501,7 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
 
                   // Distance between DC and FTOF co-ordinates
                   radia_residual = sqrt(pow(x_1b-x_FTOF,2) + pow(y_1b-y_FTOF,2) + pow(z_1b-z_FTOF,2));
-                  // h_radia_residual_1B->Fill(radia_residual);
+                  h_radia_residual_1B->Fill(radia_residual);
                }
 
                else{
@@ -611,7 +609,7 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
 
                   // Distance between DC and FTOF co-ordinates
                   radia_residual = sqrt(pow(x_2-x_FTOF,2) + pow(y_2-y_FTOF,2) + pow(z_2-z_FTOF,2));
-                  // h_radia_residual_2->Fill(radia_residual);
+                  h_radia_residual_2->Fill(radia_residual);
                }
 
                // Calculating d, distance to hit from (0,0) to (x,y)
@@ -717,10 +715,9 @@ void FTOF_Unified_2D_Edep(TString inFileName, TString outFileName, TString polar
    // Set the polarity of the magnetic field for the DC fiducial cuts
 
    Double_t Polarity; // inbending is 0, outbending is 1
-   // used to set fiducial cut automatically
+   // used to set DC fiducial cut automatically
    if(polarity == "Inbending" || polarity == "inbending") Polarity = 0;
    else if(polarity == "Outbending" || polarity == "outbending") Polarity = 1;
-   // Polarity = 1;
 
    Double_t Pim_values[4];
 
@@ -791,8 +788,6 @@ void FTOF_Unified_2D_Edep(TString inFileName, TString outFileName, TString polar
             // Looping over the 6 sectors
             for(Int_t i_sector=0;i_sector<6;i_sector++){
 
-               //create a string which we can append integers to,
-               // allows us to define a number of histograms in a for loop
 
                // Histogram names
                ostringstream Denominator_name_stream;
