@@ -183,6 +183,8 @@ void SetLorentzVector(TLorentzVector &p4,clas12::region_part_ptr rp){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_charge, int i_detector, int i_sector, vector<region_part_ptr> particles){
+   // cout << "runno" << runno << " eventno " << eventno << " polarity " << Polarity << " topo " << i_topology <<
+   // " charge " << i_charge << " det " << i_detector << " sec " << i_sector << endl;
 
    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
    // 2nd Loop over data to get detector information
@@ -378,7 +380,7 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
 
                // Distance between DC and FTOF co-ordinates
                radia_residual = sqrt(pow(x_1a-x_FTOF,2) + pow(y_1a-y_FTOF,2) + pow(z_1a-z_FTOF,2));
-               h_radia_residual_1A->Fill(radia_residual);
+               // h_radia_residual_1A->Fill(radia_residual);
             }
 
             // Calculating distance to DC trajectory from (0,0)
@@ -447,9 +449,7 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
                // Determining sector for filling histograms
                if(alpha_1a > 30) i_sector = 2;
                else if(fabs(alpha_1a) < 30) i_sector = 1;
-               else if(alpha_1a < -30){
-                  i_sector = 6;
-               }
+               else if(alpha_1a < -30) i_sector = 6;
 
                h_Denominator[i_topology - 1][i_detector][i_charge][i_sector - 1]->Fill(L_det_1a, L_Perp_1a);
                // Check if there is energy deposited on the scintillator for numerator
@@ -472,214 +472,207 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
                   h_Numerator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_1a, L_Perp_1a);
                }
             }
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //FTOF1B
+         }
+         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+         //FTOF1B
 
-            // Requiring a DC trajectory in FTOF1B
-            if(p->traj(FTOF,FTOF1B)->getDetector()==12 && p->traj(FTOF,FTOF1B)->getLayer()==2){
+         // Requiring a DC trajectory in FTOF1B
+         if(p->traj(FTOF,FTOF1B)->getDetector()==12 && p->traj(FTOF,FTOF1B)->getLayer()==2){
 
-               // Setting the detector number
-               i_detector = 1;
+            // Setting the detector number
+            i_detector = 1;
 
-               // Looking at momentum distribution for positive and negative particles
-               if(p->par()->getCharge()>0) hMomentum_1B_p->Fill(p->par()->getP());
-               else if(p->par()->getCharge()<0) hMomentum_1B_n->Fill(p->par()->getP());
+            // Looking at momentum distribution for positive and negative particles
+            if(p->par()->getCharge()>0) hMomentum_1B_p->Fill(p->par()->getP());
+            else if(p->par()->getCharge()<0) hMomentum_1B_n->Fill(p->par()->getP());
 
-               // Getting the x-, y- and z- co-ordinates from DC
-               x_1b =  p->traj(FTOF, FTOF1B)->getX();
-               y_1b =  p->traj(FTOF, FTOF1B)->getY();
-               z_1b = p->traj(FTOF, FTOF1B)->getZ();
+            // Getting the x-, y- and z- co-ordinates from DC
+            x_1b =  p->traj(FTOF, FTOF1B)->getX();
+            y_1b =  p->traj(FTOF, FTOF1B)->getY();
+            z_1b = p->traj(FTOF, FTOF1B)->getZ();
 
-               // Requiring hit in FTOF1B
+            // Requiring hit in FTOF1B
+            if(p->sci(FTOF1B)->getEnergy()){
+
+               // Getting x-, y- and z- co-ordinates from FTOF hit
+               x_FTOF =  p->sci(FTOF1B)->getX();
+               y_FTOF =  p->sci(FTOF1B)->getY();
+               z_FTOF =  p->sci(FTOF1B)->getZ();
+
+
+               // Distance between DC and FTOF co-ordinates
+               radia_residual = sqrt(pow(x_1b-x_FTOF,2) + pow(y_1b-y_FTOF,2) + pow(z_1b-z_FTOF,2));
+               // h_radia_residual_1B->Fill(radia_residual);
+            }
+
+            // Calculating d, distance to hit from (0,0) to (x,y)
+            d_1b = sqrt(pow(x_1b,2) + pow(y_1b,2));
+
+            // Calculating alpha, angle from (0,0) to hit
+            alpha_1b = TMath::RadToDeg()*atan(y_1b/x_1b);
+
+            // Calculating length from (0,0) along centre of sector
+            // For sectors 1 and 4, L is just the x value as their centre is the x-axis
+            if(fabs(alpha_1b) < 30) L_1b = fabs(x_1b);
+            else L_1b = (d_1b * cos(TMath::DegToRad()*(fabs(fabs(alpha_1b)-60))));
+
+            // Getting L in detector plane by accounting for tilt of FTOF1B (25 deg)
+            L_det_1b = L_1b / cos(TMath::DegToRad()*25);
+            // Calculating the distance along the width of the counter from centre
+            L_Perp_1b = pow(pow(d_1b,2) - pow(L_1b,2), 0.5);
+            // Checking if hit is left or right of counter centre
+            if(alpha_1b > 30){
+               if(L_Theta - alpha_1b < 0) L_Perp_1b = - L_Perp_1b;
+            }
+            else if(fabs(alpha_1b) < 30) {
+               if(alpha_1b < 0)L_Perp_1b = - L_Perp_1b;
+            }
+            else if(alpha_1b < -30) {
+               if(L_Theta + alpha_1b < 0) L_Perp_1b = - L_Perp_1b;
+            }
+
+            // Resetting the component to unphysical value
+            Component = -10;
+
+            // Checking if there is energy deposition in FTOF1B
+            if(p->sci(FTOF1B)->getEnergy()){
+               // Getting the component number for the counter hit
+               Component = p->sci(FTOF1B)->getComponent();
+               // Plotting L vs the counter number
+               hlvscounter1B->Fill(Component,L_det_1b);
+            }
+
+            // Determine which sector the hit is in using alpha and x_1b
+            // Look at positive x (sectors 1,2 and 6)
+            if(x_1b > 0){
+
+               // Determining sector for filling histograms
+               if(alpha_1b > 30) i_sector = 2;
+               else if(fabs(alpha_1b) < 30) i_sector = 1;
+               else if(alpha_1b < -30) i_sector = 6;
+
+               // Filling numerator and denominator histograms
+               h_Denominator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_1b, L_Perp_1b);
+               // Check if there is energy deposited on the scintillator
                if(p->sci(FTOF1B)->getEnergy()){
-
-                  // Getting x-, y- and z- co-ordinates from FTOF hit
-                  x_FTOF =  p->sci(FTOF1B)->getX();
-                  y_FTOF =  p->sci(FTOF1B)->getY();
-                  z_FTOF =  p->sci(FTOF1B)->getZ();
-
-
-                  // Distance between DC and FTOF co-ordinates
-                  radia_residual = sqrt(pow(x_1b-x_FTOF,2) + pow(y_1b-y_FTOF,2) + pow(z_1b-z_FTOF,2));
-                  h_radia_residual_1B->Fill(radia_residual);
-               }
-
-               else{
-
-
-               }
-
-               // Calculating d, distance to hit from (0,0) to (x,y)
-               d_1b = sqrt(pow(x_1b,2) + pow(y_1b,2));
-
-               // Calculating alpha, angle from (0,0) to hit
-               alpha_1b = TMath::RadToDeg()*atan(y_1b/x_1b);
-
-               // Calculating length from (0,0) along centre of sector
-               // For sectors 1 and 4, L is just the x value as their centre is the x-axis
-               if(fabs(alpha_1b) < 30) L_1b = fabs(x_1b);
-               else L_1b = (d_1b * cos(TMath::DegToRad()*(fabs(fabs(alpha_1b)-60))));
-
-               // Getting L in detector plane by accounting for tilt of FTOF1B (25 deg)
-               L_det_1b = L_1b / cos(TMath::DegToRad()*25);
-               // Calculating the distance along the width of the counter from centre
-               L_Perp_1b = pow(pow(d_1b,2) - pow(L_1b,2), 0.5);
-               // Checking if hit is left or right of counter centre
-               if(alpha_1b > 30){
-                  if(L_Theta - alpha_1b < 0) L_Perp_1b = - L_Perp_1b;
-               }
-               else if(fabs(alpha_1b) < 30) {
-                  if(alpha_1b < 0)L_Perp_1b = - L_Perp_1b;
-               }
-               else if(alpha_1b < -30) {
-                  if(L_Theta + alpha_1b < 0) L_Perp_1b = - L_Perp_1b;
-               }
-
-               // Resetting the component to unphysical value
-               Component = -10;
-
-               // Checking if there is energy deposition in FTOF1B
-               if(p->sci(FTOF1B)->getEnergy()){
-                  // Getting the component number for the counter hit
-                  Component = p->sci(FTOF1B)->getComponent();
-                  // Plotting L vs the counter number
-                  hlvscounter1B->Fill(Component,L_det_1b);
-               }
-
-               // Determine which sector the hit is in using alpha and x_1b
-               // Look at positive x (sectors 1,2 and 6)
-               if(x_1b > 0){
-
-                  // Determining sector for filling histograms
-                  if(alpha_1b > 30) i_sector = 2;
-                  else if(fabs(alpha_1b) < 30) i_sector = 1;
-                  else if(alpha_1b < -30) i_sector = 6;
-
-                  }
-
-                  // Filling numerator and denominator histograms
-                  h_Denominator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_1b, L_Perp_1b);
-                  // Check if there is energy deposited on the scintillator
-                  if(p->sci(FTOF1B)->getEnergy()){
-                     h_Numerator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_1b, L_Perp_1b);
-                  }
-               }
-
-               // Look at negative x (sectors 3,4 and 5)
-               else if(x_1b < 0){
-
-                  // Determining sector for filling histograms
-                  if(alpha_1b > 30) i_sector = 5;
-                  else if(fabs(alpha_1b) < 30) i_sector = 4;
-                  else if(alpha_1b < -30) i_sector = 3;
-
-                  // Filling numerator and denominator histograms
-                  h_Denominator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_1b, L_Perp_1b);
-                  // Check if there is energy deposited on the scintillator
-                  if(p->sci(FTOF1B)->getEnergy()){
-                     h_Numerator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_1b, L_Perp_1b);
-                  }
+                  h_Numerator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_1b, L_Perp_1b);
                }
             }
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //FTOF2
 
-            // Requiring a DC trajectory in FTOF1B
-            if(p->traj(FTOF,FTOF2)->getDetector()==12 && p->traj(FTOF,FTOF2)->getLayer()==3){
+            // Look at negative x (sectors 3,4 and 5)
+            else if(x_1b < 0){
 
-               // Setting the detector number
-               i_detector = 2;
+               // Determining sector for filling histograms
+               if(alpha_1b > 30) i_sector = 5;
+               else if(fabs(alpha_1b) < 30) i_sector = 4;
+               else if(alpha_1b < -30) i_sector = 3;
 
-               // Looking at momentum distribution for positive and negative particles
-               if(p->par()->getCharge()>0) hMomentum_2_p->Fill(p->par()->getP());
-               else if(p->par()->getCharge()<0) hMomentum_2_n->Fill(p->par()->getP());
+               // Filling numerator and denominator histograms
+               h_Denominator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_1b, L_Perp_1b);
+               // Check if there is energy deposited on the scintillator
+               if(p->sci(FTOF1B)->getEnergy()){
+                  h_Numerator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_1b, L_Perp_1b);
+               }
+            }
+         }
+         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+         //FTOF2
 
-               // Getting the x-, y- and z- co-ordinates from DC
-               x_2 =  p->traj(FTOF, FTOF2)->getX();
-               y_2 =  p->traj(FTOF, FTOF2)->getY();
-               z_2 = p->traj(FTOF, FTOF2)->getZ();
+         // Requiring a DC trajectory in FTOF1B
+         if(p->traj(FTOF,FTOF2)->getDetector()==12 && p->traj(FTOF,FTOF2)->getLayer()==3){
 
-               // Checking if there is energy deposition in FTOF2
+            // Setting the detector number
+            i_detector = 2;
+
+            // Looking at momentum distribution for positive and negative particles
+            if(p->par()->getCharge()>0) hMomentum_2_p->Fill(p->par()->getP());
+            else if(p->par()->getCharge()<0) hMomentum_2_n->Fill(p->par()->getP());
+
+            // Getting the x-, y- and z- co-ordinates from DC
+            x_2 =  p->traj(FTOF, FTOF2)->getX();
+            y_2 =  p->traj(FTOF, FTOF2)->getY();
+            z_2 = p->traj(FTOF, FTOF2)->getZ();
+
+            // Checking if there is energy deposition in FTOF2
+            if(p->sci(FTOF2)->getEnergy()){
+
+               // Getting x-, y- and z- co-ordinates from FTOF hit
+               x_FTOF =  p->sci(FTOF2)->getX();
+               y_FTOF =  p->sci(FTOF2)->getY();
+               z_FTOF =  p->sci(FTOF2)->getZ();
+
+               // Distance between DC and FTOF co-ordinates
+               radia_residual = sqrt(pow(x_2-x_FTOF,2) + pow(y_2-y_FTOF,2) + pow(z_2-z_FTOF,2));
+               // h_radia_residual_2->Fill(radia_residual);
+            }
+
+            // Calculating d, distance to hit from (0,0) to (x,y)
+            d_2 = sqrt(pow(x_2,2) + pow(y_2,2));
+
+            // Calculating alpha, angle from (0,0) to hit
+            alpha_2 = TMath::RadToDeg()*atan(y_2/x_2);
+
+            // Calculating length from (0,0) along centre of sector
+            // For sectors 1 and 4, L is just the x value as their centre is the x-axis
+            if(fabs(alpha_2) < 30) L_2 = fabs(x_2);
+            else L_2 = (d_2 * cos(TMath::DegToRad()*(fabs(fabs(alpha_2)-60))));
+
+            // Getting L in detector plane by accounting for tilt of FTOF2 (58.11 deg)
+            L_det_2 = L_2 / cos(TMath::DegToRad()*58.11);
+            // Calculating the distance along the width of the counter
+            L_Perp_2 = pow(pow(d_2,2) - pow(L_2,2), 0.5);
+            // Checking if hit is left or right of counter centre
+            if(alpha_2 > 30){
+               if(L_Theta - alpha_2 < 0) L_Perp_2 = - L_Perp_2;
+            }
+            else if(fabs(alpha_2) < 30) {
+               if(alpha_2 < 0)L_Perp_2 = - L_Perp_2;
+            }
+            else if(alpha_2 < -30) {
+               if(L_Theta + alpha_2 < 0) L_Perp_2 = - L_Perp_2;
+            }
+
+            // Resetting the component to unphysical value
+            Component = -10;
+
+            // Checking if there is energy deposition in FTOF2
+            if(p->sci(FTOF2)->getEnergy()){
+               // Getting the component number for the counter hit
+               Component = p->sci(FTOF2)->getComponent();
+               // Plotting L vs the counter number
+               hlvscounter2->Fill(Component,L_det_2);
+            }
+
+            // Determine which sector the hit is in using alpha
+            // Look at positive x (sectors 1,2 and 6)
+            if(x_2 > 0){
+
+               // Determining sector for filling histograms
+               if(alpha_2 > 30) i_sector = 2;
+               else if(fabs(alpha_2) < 30) i_sector = 1;
+               else if(alpha_2 < -30) i_sector = 6;
+
+               // Filling numerator and denominator histograms
+               h_Denominator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_2, L_Perp_2);
+               // Check if there is energy deposited on the scintillator
                if(p->sci(FTOF2)->getEnergy()){
-
-                  // Getting x-, y- and z- co-ordinates from FTOF hit
-                  x_FTOF =  p->sci(FTOF2)->getX();
-                  y_FTOF =  p->sci(FTOF2)->getY();
-                  z_FTOF =  p->sci(FTOF2)->getZ();
-
-                  // Distance between DC and FTOF co-ordinates
-                  radia_residual = sqrt(pow(x_2-x_FTOF,2) + pow(y_2-y_FTOF,2) + pow(z_2-z_FTOF,2));
-                  h_radia_residual_2->Fill(radia_residual);
+                  h_Numerator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_2, L_Perp_2);
                }
+            }
 
-               // Calculating d, distance to hit from (0,0) to (x,y)
-               d_2 = sqrt(pow(x_2,2) + pow(y_2,2));
+            // Look at negative x (sectors 3,4 and 5)
+            else if(x_2 < 0){
 
-               // Calculating alpha, angle from (0,0) to hit
-               alpha_2 = TMath::RadToDeg()*atan(y_2/x_2);
+               // Determining sector for filling histograms
+               if(alpha_2 > 30) i_sector = 5;
+               else if(fabs(alpha_2) < 30) i_sector = 4;
+               else if(alpha_2 < -30) i_sector = 3;
 
-               // Calculating length from (0,0) along centre of sector
-               // For sectors 1 and 4, L is just the x value as their centre is the x-axis
-               if(fabs(alpha_2) < 30) L_2 = fabs(x_2);
-               else L_2 = (d_2 * cos(TMath::DegToRad()*(fabs(fabs(alpha_2)-60))));
-
-               // Getting L in detector plane by accounting for tilt of FTOF2 (58.11 deg)
-               L_det_2 = L_2 / cos(TMath::DegToRad()*58.11);
-               // Calculating the distance along the width of the counter
-               L_Perp_2 = pow(pow(d_2,2) - pow(L_2,2), 0.5);
-               // Checking if hit is left or right of counter centre
-               if(alpha_2 > 30){
-                  if(L_Theta - alpha_2 < 0) L_Perp_2 = - L_Perp_2;
-               }
-               else if(fabs(alpha_2) < 30) {
-                  if(alpha_2 < 0)L_Perp_2 = - L_Perp_2;
-               }
-               else if(alpha_2 < -30) {
-                  if(L_Theta + alpha_2 < 0) L_Perp_2 = - L_Perp_2;
-               }
-
-               // Resetting the component to unphysical value
-               Component = -10;
-
-               // Checking if there is energy deposition in FTOF2
+               // Filling numerator and denominator histograms
+               h_Denominator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_2, L_Perp_2);
+               // Check if there is energy deposited on the scintillator
                if(p->sci(FTOF2)->getEnergy()){
-                  // Getting the component number for the counter hit
-                  Component = p->sci(FTOF2)->getComponent();
-                  // Plotting L vs the counter number
-                  hlvscounter2->Fill(Component,L_det_2);
-               }
-
-               // Determine which sector the hit is in using alpha
-               // Look at positive x (sectors 1,2 and 6)
-               if(x_2 > 0){
-
-                  // Determining sector for filling histograms
-                  if(alpha_2 > 30) i_sector = 2;
-                  else if(fabs(alpha_2) < 30) i_sector = 1;
-                  else if(alpha_2 < -30) i_sector = 6;
-
-                  // Filling numerator and denominator histograms
-                  h_Denominator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_2, L_Perp_2);
-                  // Check if there is energy deposited on the scintillator
-                  if(p->sci(FTOF2)->getEnergy()){
-                     h_Numerator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_2, L_Perp_2);
-                  }
-               }
-
-               // Look at negative x (sectors 3,4 and 5)
-               else if(x_2 < 0){
-
-                  // Determining sector for filling histograms
-                  if(alpha_2 > 30) i_sector = 5;
-                  else if(fabs(alpha_2) < 30) i_sector = 4;
-                  else if(alpha_2 < -30) i_sector = 3;
-
-                  // Filling numerator and denominator histograms
-                  h_Denominator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_2, L_Perp_2);
-                  // Check if there is energy deposited on the scintillator
-                  if(p->sci(FTOF2)->getEnergy()){
-                     h_Numerator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_2, L_Perp_2);
-                  }
+                  h_Numerator[i_topology-1][i_detector][i_charge][i_sector - 1]->Fill(L_det_2, L_Perp_2);
                }
             }
          }
@@ -688,7 +681,7 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
 }
 
 // Loading macro
-void FTOF_Unified_2D_Edep(TString inFileName, TString outFileName, TString polarity){
+void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity){
 
    // Creating a TChain of all the input files
    TChain fake("hipo");
@@ -716,8 +709,8 @@ void FTOF_Unified_2D_Edep(TString inFileName, TString outFileName, TString polar
 
    Double_t Polarity; // inbending is 0, outbending is 1
    // used to set DC fiducial cut automatically
-   if(polarity == "Inbending" || polarity == "inbending") Polarity = 0;
-   else if(polarity == "Outbending" || polarity == "outbending") Polarity = 1;
+   if(polarity == "in" || polarity == "In" || polarity == "Inbending" || polarity == "inbending") Polarity = 0;
+   else if(polarity == "out" || polarity == "Out" || polarity == "Outbending" || polarity == "outbending") Polarity = 1;
 
    Double_t Pim_values[4];
 
@@ -863,7 +856,6 @@ void FTOF_Unified_2D_Edep(TString inFileName, TString outFileName, TString polar
 
       // Looping over events in the current file
       while(c12.next()==true){
-
          runno = c12.runconfig()->getRun(); // Getting the run number
          eventno = c12.runconfig()->getEvent(); // Getting the event number
 
@@ -956,7 +948,6 @@ void FTOF_Unified_2D_Edep(TString inFileName, TString outFileName, TString polar
          // Getting missing pi^- events
          if(nonelectron == 1 && protons.size() == 1 && pips.size() == 1)
          {
-
             // Setting the four vectors
             SetLorentzVector(pr,protons[0]);
             SetLorentzVector(pip,pips[0]);
@@ -1064,6 +1055,7 @@ void FTOF_Unified_2D_Edep(TString inFileName, TString outFileName, TString polar
             }
          }
       }
+
       v_Runno.push_back(to_string(runno)); // Converting runno integer to a string
    }
    //saving the file
