@@ -1,12 +1,14 @@
 // Make sure to set the Data, Date and Version string before running
 
 {
+   //////////////////////////////////////////////////////////////////////////////
+   //// User defined values  ////////////////////////////////////////////////////
+   //////////////////////////////////////////////////////////////////////////////
+
+
    // Give the input analysis file to determine efficieny for
    TFile *f1=new TFile("/media/mn688/Elements1/PhD/FTOF/RGA_Spring19_Inbending_Compare_2pi_singletrack_25052022_01/RGA_Spring19_Inbending_Total.root");
 
-   //////////////////////////////////////////////////////////////////////////////
-   ////Define variables for naming and limits ///////////
-   //////////////////////////////////////////////////////////////////////////////
 
    // Information for canvas and histogram name
    ostringstream Data;
@@ -16,20 +18,23 @@
    ostringstream Layer;
    ostringstream Charge;
    ostringstream Sector;
+   ostringstream Canvas_Out;
    // Setting the strings for canvas name
    Data<<"RGA_Spring19_Inbending_dst_methodcomparison";
    Date<<"25052022";
    Version<<"01";
 
+   // Where canvases are saved
+   Canvas_Out<<"/media/mn688/Elements1/PhD/FTOF/Efficiency_Canvases/RGA_Spring19_Inbending_methodcomparison_27052022_01";
+   // Output root file
    TFile fout("/media/mn688/Elements1/PhD/FTOF/RGA_Spring19_Inbending_Compare_2pi_singletrack_25052022_01/RGA_Spring19_Inbending_Efficiency_Output_27052022.root","recreate");
 
 
-   Int_t detector_min, detector_max; // Limits for FTOF layers
-   Int_t charge_min, charge_max; // Limits for charge
 
    //////////////////////////////////////////////////////////////////////////////
-   ////Creating arrays of histograms for the numerator and denominator///////////
+   ////Creating arrays of histograms and canvases  /////////////////////////////
    //////////////////////////////////////////////////////////////////////////////
+
 
    // Denominator
    TH1F *Denominator_y[4][3][2][6];
@@ -40,11 +45,6 @@
    TH1F *Numerator_y_copy[4][3][2][6];
    TH1F *Overall_Numerator_y[3][2][6];
 
-
-   //////////////////////////////////////////////////////////////////////////////
-   ////Creating arrays of canvases for efficieny plots //////////////////////////
-   //////////////////////////////////////////////////////////////////////////////
-
    // Creating arrays of canvases [FTOF layer] [charge]
    TCanvas* canvas_y[4][3][2]; // canvases for efficieny vs L
 
@@ -53,6 +53,9 @@
    //////////////////////////////////////////////////////////////////////////////
    ////Loop over topology, layer, charge, and sector ///////////
    //////////////////////////////////////////////////////////////////////////////
+
+   Int_t detector_min, detector_max; // Limits for FTOF layers
+   Int_t charge_min, charge_max; // Limits for charge
 
    // Looping over topology
    for(Int_t i_topology=0;i_topology < 4;i_topology++){
@@ -123,7 +126,7 @@
             canvas_y_name_stream<<Topology.str().c_str()<<"_"<<Layer.str().c_str()<<"_"<<Charge.str().c_str()<<"_L";
 
             // Setting the file name for each canvas
-            canvas_y_file_name_stream<<"/media/mn688/Elements1/PhD/FTOF/Efficiency_Canvases/RGA_Spring19_Inbending_methodcomparison_27052022_01/"<<Data.str().c_str()<<"_"<<Topology.str().c_str()<<"_"<<Layer.str().c_str()<<"_"<<Charge.str().c_str()<<"_"<<Date.str().c_str()<<"_"<<Version.str().c_str()<<".pdf";
+            canvas_y_file_name_stream<<Canvas_Out.str().c_str()<<"/"<<Data.str().c_str()<<"_"<<Topology.str().c_str()<<"_"<<Layer.str().c_str()<<"_"<<Charge.str().c_str()<<"_"<<Date.str().c_str()<<"_"<<Version.str().c_str()<<".pdf";
 
 
             // creating canvas for each topology, FTOF layer, and charge
@@ -171,11 +174,6 @@
                Denominator_y[i_topology][i_detector][i_charge][i_sector] = (TH1F*) h_Denominator->ProjectionX(); // denominator
                Numerator_y[i_topology][i_detector][i_charge][i_sector] = (TH1F*) h_Numerator->ProjectionX(); // numerator
 
-               //////////////////////////////////////////////////////////////////////////////
-               // Determine efficieny and error for 2pi and single track method /////////////
-               //////////////////////////////////////////////////////////////////////////////
-
-               // 2pi and single track
                // Determine errors
                Numerator_y[i_topology][i_detector][i_charge][i_sector]->Sumw2();
 
@@ -211,6 +209,8 @@
 
                // Dividing the numerator histogram by the denominator histogram
                Numerator_y[i_topology][i_detector][i_charge][i_sector]->Divide(Denominator_y[i_topology][i_detector][i_charge][i_sector]);
+
+
                //////////////////////////////////////////////////////////////////////
                // Renaming the bin labels to match the counters  ///////////
                //////////////////////////////////////////////////////////////////////
@@ -227,7 +227,7 @@
                }
 
                //////////////////////////////////////////////////////////////////////
-               // Plotting efficieny against L for each sector on canvas  ///////////
+               // Plotting efficieny against counter for each sector on canvas  ///////////
                //////////////////////////////////////////////////////////////////////
 
                // Selecting correct canvas and drawing histogram
@@ -255,6 +255,9 @@
       }
    }
 
+   //////////////////////////////////////////////////////////////////////
+   // Making final result with single track and 2pi method combined  ///////////
+   //////////////////////////////////////////////////////////////////////
 
 
    // Looping over the FTOF layers
@@ -282,7 +285,7 @@
          canvas_y_name_stream<<"Overall_Result_"<<Layer.str().c_str()<<"_"<<Charge.str().c_str()<<"_L";
 
          // Setting the file name for each canvas
-         canvas_y_file_name_stream<<"/media/mn688/Elements1/PhD/FTOF/Efficiency_Canvases/RGA_Spring19_Inbending_methodcomparison_27052022_01/"<<Data.str().c_str()<<"_Overall_Result_"<<Layer.str().c_str()<<"_"<<Charge.str().c_str()<<"_"<<Date.str().c_str()<<"_"<<Version.str().c_str()<<".pdf";
+         canvas_y_file_name_stream<<Canvas_Out.str().c_str()<<"/"<<Data.str().c_str()<<"_Overall_Result_"<<Layer.str().c_str()<<"_"<<Charge.str().c_str()<<"_"<<Date.str().c_str()<<"_"<<Version.str().c_str()<<".pdf";
 
 
          // creating canvas for each topology, FTOF layer, and charge
@@ -486,7 +489,7 @@
             Overall_Numerator_y[i_detector][i_charge][i_sector]->SetLineColor(kBlue);
 
             //////////////////////////////////////////////////////////////////////
-            // Plotting efficieny against L for each sector on canvas  ///////////
+            // Plotting efficieny against counter for each sector on canvas  ///////////
             //////////////////////////////////////////////////////////////////////
 
             // Selecting correct canvas and drawing histogram
