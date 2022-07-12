@@ -183,8 +183,6 @@ void SetLorentzVector(TLorentzVector &p4,clas12::region_part_ptr rp){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_charge, int i_detector, int i_sector, vector<region_part_ptr> particles){
-   // cout << "runno" << runno << " eventno " << eventno << " polarity " << Polarity << " topo " << i_topology <<
-   // " charge " << i_charge << " det " << i_detector << " sec " << i_sector << endl;
 
    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
    // 2nd Loop over data to get detector information
