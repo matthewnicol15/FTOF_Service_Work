@@ -5,8 +5,8 @@ Int_t Run_Period = 2; // RGA Fall 2018 = 1, RGA Spring 2019 = 2, RGB Spring 2019
 
 
 #include "DC_Fiducial_Cuts_CLAS12.cxx"
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
 #include <chrono>
 #include <TFile.h>
 #include <TTree.h>
@@ -14,27 +14,18 @@ Int_t Run_Period = 2; // RGA Fall 2018 = 1, RGA Spring 2019 = 2, RGB Spring 2019
 #include <TROOT.h>
 #include <TDatabasePDG.h>
 #include <TLorentzVector.h>
-#include <TVector3.h>
-#include <vector>
 #include <TH1.h>
 #include <TH2.h>
-#include <TH3.h>
-#include <THnSparse.h>
 #include <TChain.h>
 #include <TCanvas.h>
-#include <TPaletteAxis.h>
 #include <TBenchmark.h>
+#include "HipoChain.h"
 #include "clas12reader.h"
-#include <stdlib.h>
-#include "Riostream.h"
-#include "TLine.h"
-#include "TVirtualPad.h"
-#include "TClass.h"
-#include "TVirtualX.h"
-#include "TMath.h"
-#include "TStyle.h"
+#include <vector>
+#include "rcdb_reader.h"
 
 using namespace clas12;
+using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Creating vectors and variables
@@ -43,9 +34,11 @@ using namespace clas12;
 auto db=TDatabasePDG::Instance();
 
 // Define beam and target
-TLorentzVector beam(0,0,10.6,10.6); // beam Px,Py,Pz,E
-// TLorentzVector target(0,0,0,1.8756); // target Px,Py,Pz,E
-TLorentzVector target(0,0,0,db->GetParticle(2212)->Mass()); // target Px,Py,Pz,E
+TLorentzVector beam(0,0,0,0); // beam Px,Py,Pz,E
+Double_t beam_E; // Used for the beam energy obtained from the RCDB
+
+// TLorentzVector target(0,0,0,db->GetParticle(2212)->Mass()); // target Px,Py,Pz,E
+TLorentzVector target; // target Px,Py,Pz,E
 
 // Creating TLorentzVectors for detected particles
 TLorentzVector el(0,0,0,db->GetParticle(11)->Mass()); // scattered e^- Px,Py,Pz,E
@@ -155,6 +148,7 @@ auto* hMomentum_1A_n=new TH1F();
 auto* hMomentum_1B_n=new TH1F();
 auto* hMomentum_2_n=new TH1F();
 auto *h_z_vertex_before=new TH1D();
+auto *h_z_vertex_after=new TH1D();
 auto *h_Pid=new TH1D();
 
 
@@ -675,11 +669,17 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
 }
 
 // Loading macro
-void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity){
+void FTOF_Efficiency(const std::string databaseF, TString inFileName, TString outFileName, TString polarity, const std::string targetMass){
 
    // Creating a TChain of all the input files
-   TChain fake("hipo");
-   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   // TChain fake("hipo");
+
+   /////////////////////////////////////////////////////////////////////////
+   // Loading the various files required
+
+   // Connecting to the RCDB database file for the input file
+   const std::string DBfile = databaseF;
+   clas12databases::SetRCDBRootConnection(DBfile);
 
    // Defining input and output files
    // Data files to process
@@ -687,12 +687,9 @@ void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity){
    TString outputFile = outFileName;
 
    // Adding the different input files to the TChain
-   fake.Add(inputFile.Data());
+   // fake.Add(inputFile.Data());
 
-   // Retrieving list of files
-   auto files=fake.GetListOfFiles();
-   // Gets total events in all files for run dependence binning
-   Int_t Bins = files->GetEntries();
+
 
    // Output file location and name
    // TFile fileOutput1("FTOF1B_Sector_6_Check_29042022_01.root","recreate");
@@ -708,6 +705,9 @@ void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity){
 
    Double_t Pim_values[4];
 
+   // convert string to double
+   double targetM;
+   targetM = stod(targetMass.c_str());
 
    Int_t eventcount=0;
 
@@ -842,21 +842,37 @@ void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity){
    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
    // 1st Loop over data to find 2pi events
 
-   //Loop over files
-   for(Int_t i=0;i<files->GetEntries();i++){
+   //Creating a chain for the data from different filesc12->queryRcdb();
+   clas12root::HipoChain chain;
+   chain.Add(inputFile);
+   chain.SetReaderTags({0});  //create clas12reader with just tag 0 events
+   auto config_c12=chain.GetC12Reader();
 
-      Binno++; // Count the number of files, therefore the number of x bins
+   chain.db()->turnOffQADB();
 
-      //create the event reader
-      clas12reader c12(files->At(i)->GetTitle());
+   auto& rcdbData= config_c12->rcdb()->current();
+
+   auto& c12=chain.C12ref();
 
       // Looping over events in the current file
-      while(c12.next()==true){
-         runno = c12.runconfig()->getRun(); // Getting the run number
-         eventno = c12.runconfig()->getEvent(); // Getting the event number
+      while(chain.Next()==true){
+
+         // check if it's a different run
+         if(runno != c12->runconfig()->getRun()){
+
+            Binno++; // Count the number of files, therefore the number of x bins
+            runno = c12->runconfig()->getRun(); // Getting the run number
+
+         }
+
+         eventno = c12->runconfig()->getEvent(); // Getting the event number
+
+         // Setting beam energy depending on which run it is
+         beam_E = rcdbData.beam_energy*0.001;
+         beam.SetXYZM(0, 0, beam_E, 0.000511);
 
          // Access the particle bank for each event
-         auto particles = c12.getDetParticles();
+         auto particles = c12->getDetParticles();
 
 
          // Setting variables to zero at start  of each event
@@ -872,10 +888,10 @@ void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity){
          DeltaPhi = 0; // Phi
 
          // Use event builder PID to grab particles
-         auto electrons=c12.getByID(11);
-         auto protons=c12.getByID(2212);
-         auto pips=c12.getByID(211);
-         auto pims=c12.getByID(-211);
+         auto electrons=c12->getByID(11);
+         auto protons=c12->getByID(2212);
+         auto pips=c12->getByID(211);
+         auto pims=c12->getByID(-211);
 
          // Looping over all particles in this event
          for(auto& p : particles){
@@ -924,22 +940,10 @@ void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity){
          // Perform efficieny calculations for single track events
          Second_Loop(runno, eventno, Polarity, 4, -1, -1, -1, particles);
 
-         // Checking run period for beam energy
-         // Setting the beam energy
-         if(Run_Period == 1){
-            beam.SetXYZM(0,0,10.6,0);
-         }
-         else if(Run_Period == 2){
-            beam.SetXYZM(0,0,10.2,0);
-         }
-         else if(Run_Period == 3){
-            if(runno > 6419) beam.SetXYZM(0,0,10.2,0);
-         }
-
-         beam.SetXYZM(0,0,10.4,0);
-
          // Selecting only events with 2 positive, 2 negative and 1 electron
          if(positive != 2 || negative != 2) continue;
+
+         target.SetXYZM(0,0,0,targetM);
 
          // Getting missing pi^- events
          if(nonelectron == 1 && protons.size() == 1 && pips.size() == 1)
@@ -1053,7 +1057,7 @@ void FTOF_Efficiency(TString inFileName, TString outFileName, TString polarity){
       }
 
       v_Runno.push_back(to_string(runno)); // Converting runno integer to a string
-   }
+   // }
    //saving the file
    fileOutput1.Write();
    fileOutput1.Close();
