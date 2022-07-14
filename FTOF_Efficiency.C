@@ -246,6 +246,10 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
 
          // Check if DC cuts are on
          if(DC_Fiducial_Cuts != 0){
+            // DC co-ordinates before DC cuts
+            h_DC_c1_xy_before->Fill(part_DC_c1x, part_DC_c1y);
+            h_DC_c2_xy_before->Fill(part_DC_c2x, part_DC_c2y);
+            h_DC_c3_xy_before->Fill(part_DC_c3x, part_DC_c3y);
 
             // Require hit in three layers of DC
             if((p->traj(DC,6)->getLayer() != 6 || p->traj(DC,18)->getLayer() != 18 || p->traj(DC,36)->getLayer() != 36))continue;
@@ -269,10 +273,6 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
                part_DC_c3z = p->traj(DC,36)->getZ();
             }
 
-            // DC co-ordinates before DC cuts
-            h_DC_c1_xy_before->Fill(part_DC_c1x, part_DC_c1y);
-            h_DC_c2_xy_before->Fill(part_DC_c2x, part_DC_c2y);
-            h_DC_c3_xy_before->Fill(part_DC_c3x, part_DC_c3y);
 
             // Reset PID value to zero each loop
             part_pid = 0;
@@ -332,10 +332,10 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
             h_beta->Fill(Momentum,p->par()->getBeta());
             // Removing particles with unphysical beta
             if(beta < 0.4 || beta >1.1)continue;
+            // Testing Beta cut
+            h_beta_cut_test->Fill(Momentum,p->par()->getBeta());
          }
 
-         // Testing Beta cut
-         h_beta_cut_test->Fill(Momentum,p->par()->getBeta());
 
          // Getting the PID values
          h_Pid->Fill(p->par()->getPid());
@@ -398,12 +398,12 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
             }
 
 
-            // FTOF co-ordinates before FTOF fiducial cut
-            h_FTOF1A_LvsLperp_before->Fill(L_Perp_1a, L_det_1a);
 
 
             // Checking if FTOF fiducial cuts are on
             if(FTOF_Fiducial_Cuts != 0){
+               // FTOF co-ordinates before FTOF fiducial cut
+               h_FTOF1A_LvsLperp_before->Fill(L_Perp_1a, L_det_1a);
 
                // Loose FTOF1A fiducial cuts
                if(FTOF_Fiducial_Cuts == 1){
@@ -414,10 +414,12 @@ void Second_Loop(int runno, int eventno, int Polarity, int i_topology, int i_cha
                if(FTOF_Fiducial_Cuts == 2){
                   if(L_det_1a < 80 || L_det_1a > 410 || (L_det_1a - (2.2 * fabs(L_Perp_1a))) < 58) continue;
                }
+               // FTOF co-ordinates before FTOF fiducial cut
+               h_FTOF1A_LvsLperp_after->Fill(L_Perp_1a, L_det_1a);
             }
 
+
             // Testing FTOF fiducial cut
-            h_FTOF1A_LvsLperp_after->Fill(L_Perp_1a, L_det_1a);
 
             // Resetting the component to unphysical value as check
             Component = -10;
