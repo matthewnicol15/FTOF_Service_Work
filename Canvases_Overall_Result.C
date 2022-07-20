@@ -7,7 +7,7 @@
 
 
    // Give the input analysis file to determine efficieny for
-   TFile *f1=new TFile("/media/mn688/Elements1/PhD/FTOF/RGA_Spring19_Inbending_Compare_2pi_singletrack_25052022_01/RGA_Spring19_Inbending_Total.root");
+   TFile *f1=new TFile("/mnt/d/PhD/FTOF/RGA_Fall18_Inbending_14072022_01/RGA_Fall18_Inbending5032.root");
 
 
    // Information for canvas and histogram name
@@ -20,14 +20,14 @@
    ostringstream Sector;
    ostringstream Canvas_Out;
    // Setting the strings for canvas name
-   Data<<"RGA_Spring19_Inbending_dst_methodcomparison";
-   Date<<"25052022";
+   Data<<"RGA_Fall18_Inbending_5032_dst";
+   Date<<"14072022";
    Version<<"01";
 
    // Where canvases are saved
-   Canvas_Out<<"/media/mn688/Elements1/PhD/FTOF/Efficiency_Canvases/RGA_Spring19_Inbending_methodcomparison_27052022_01";
+   Canvas_Out<<"/mnt/d/PhD/FTOF/Efficiency_Canvases/Test";
    // Output root file
-   TFile fout("/media/mn688/Elements1/PhD/FTOF/RGA_Spring19_Inbending_Compare_2pi_singletrack_25052022_01/RGA_Spring19_Inbending_Efficiency_Output_27052022.root","recreate");
+   TFile fout("/mnt/d/PhD/FTOF/RGA_Fall18_Inbending_14072022_01/RGA_Fall18_Inbending5032_Efficiency_Output_140722.root","recreate");
 
 
 
@@ -46,7 +46,7 @@
    TH1F *Overall_Numerator_y[3][2][6];
 
    // Creating arrays of canvases [FTOF layer] [charge]
-   TCanvas* canvas_y[4][3][2]; // canvases for efficieny vs L
+   TCanvas* canvas_y[5][3][2]; // canvases for efficieny vs L
 
    gStyle->SetOptStat(0); // Remove statistics from canvases
 
